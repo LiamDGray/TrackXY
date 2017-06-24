@@ -118,4 +118,4 @@ Solution designed by Liam Gray for Bill Murphy with input from Simon Tang.
 
 DONATIONS
 
-Please donate (perhaps via my PayPal account, liamdgray@gmail.com) to support further development of TrackXY and other open-source developments.
+Please donate via my PayPal account, liamdgray@gmail.com, to support further development of TrackXY and other open-source developments.
