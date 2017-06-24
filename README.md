@@ -48,7 +48,7 @@ USAGE:
 
 
 
-For Windows, download the archive (for version 0.7 it is "windows-0.7.zip"), extract it to a location of your choosing, and double-click the .exe file(currently trackx.exe) to start TrackXY.
+For Windows, download OpenCV 2.4.2, extract it to a location of your choosing, set system paths so that OpenCV DLLs can be found (see  http://docs.opencv.org/2.4/doc/tutorials/introduction/windows_install/windows_install.html#windowssetpathandenviromentvariable ), and double-click trackx.exe (or type trackx at command prompt) to start TrackXY.
 
 After starting TrackXY, a console window will open. Enter camera number (typically 0 for built-in camera  or 1 for an external camera) and press Enter. Enter a filename and press Enter. A video display window will open, showing the webcam's view.  Click the mouse in the video display window to start recording. If applicable, click again to mark each new segment with a counter that increments in the column "number of clicks."
 
@@ -70,7 +70,7 @@ INSTALLATION
 
 The current code is known to compile in Microsoft Visual Studio C++ 2010 and a project file for that compiler is included.  The program has run and worked well under Windows 7.
 
-The code has been linked against OpenCV 2.4.2 and requires its DLLs for 32-bit Windows.  The Windows version also requires the Visual C++ 2010 "Redistributable Package."  These are copyright Intel and Microsoft respectively and bound by their respective terms.  They can be downloaded from the following locations:
+The code has been built for OpenCV 2.4.2 and requires its DLLs for 32-bit Windows.  The Windows version also requires the Visual C++ 2010 "Redistributable Package."  These are copyright Intel and Microsoft respectively and bound by their respective terms.  They can be downloaded from the following locations:
 
 
 
@@ -80,7 +80,7 @@ http://sourceforge.net/projects/opencvlibrary/files/opencv-win/2.4.2/OpenCV-2.4.
 
 
 
-(The easiest way to install the OpenCV libraries for TrackXY is to run the OpenCV .exe file to extract the self-extracting archive to <folder> and then copy the files from <folder>\build\x86\VC10\bin to the folder in which TrackX.exe resides.)
+(One inelegant but foolproof way to install the OpenCV libraries for TrackXY is to run the OpenCV .exe file to extract the self-extracting archive to <folder> and then copy the files from <folder>\build\x86\VC10\bin to the folder in which TrackX.exe resides.)
 
 
 
