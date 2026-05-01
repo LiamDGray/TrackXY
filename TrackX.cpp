@@ -62,6 +62,9 @@ int main(int argc, char** argv) {
     PointTracker tracker;
     Visualizer visualizer;
     Calibrator calibrator;
+    if (calibrator.load("calibration.yml")) {
+        cout << "Loaded calibration from calibration.yml" << endl;
+    }
     OscillationAnalyzer analyzerX;
     OscillationAnalyzer analyzerY;
     Mat frame, gray, display;

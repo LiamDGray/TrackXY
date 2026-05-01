@@ -33,7 +33,7 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 
 ### [ ] Phase 4: Advanced Analysis & UX
 - [x] Fix primary point identity (prevent jumping to chaperones).
-- [ ] Implement dual-axis (XY) oscillation analysis.
+- [x] Implement dual-axis (XY) oscillation analysis.
 - [ ] Add support for saving/loading calibration.
 - [ ] Improve CLI argument parsing (add flags, better help).
 

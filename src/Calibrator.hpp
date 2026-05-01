@@ -1,6 +1,7 @@
 #pragma once
 
 #include <opencv2/core.hpp>
+#include <string>
 
 /**
  * @brief Handles conversion between pixel coordinates and real-world units.
@@ -46,6 +47,31 @@ public:
      * @brief Get the origin in pixel coordinates.
      */
     cv::Point2f getOrigin() const { return origin; }
+
+    /**
+     * @brief Save calibration to a file.
+     * @param filename Path to the file.
+     */
+    void save(const std::string& filename) const {
+        cv::FileStorage fs(filename, cv::FileStorage::WRITE);
+        if (fs.isOpened()) {
+            fs << "origin" << origin;
+            fs << "pixelsPerUnit" << pixelsPerUnit;
+        }
+    }
+
+    /**
+     * @brief Load calibration from a file.
+     * @param filename Path to the file.
+     * @return true if successful, false otherwise.
+     */
+    bool load(const std::string& filename) {
+        cv::FileStorage fs(filename, cv::FileStorage::READ);
+        if (!fs.isOpened()) return false;
+        fs["origin"] >> origin;
+        fs["pixelsPerUnit"] >> pixelsPerUnit;
+        return true;
+    }
 
 private:
     cv::Point2f origin;
