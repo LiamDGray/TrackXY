@@ -62,7 +62,8 @@ int main(int argc, char** argv) {
     PointTracker tracker;
     Visualizer visualizer;
     Calibrator calibrator;
-    OscillationAnalyzer analyzer;
+    OscillationAnalyzer analyzerX;
+    OscillationAnalyzer analyzerY;
     Mat frame, gray, display;
     bool nightMode = false;
     int samplenumber = 0;
@@ -91,11 +92,12 @@ int main(int argc, char** argv) {
                 samplenumber++;
                 cv::Point2f calPt = calibrator.transform(points[0]);
                 logger.log(samplenumber, elapsed, points[0].x, points[0].y, calPt.x, calPt.y, "tracking");
-                analyzer.addSample(calPt.x, elapsed);
+                analyzerX.addSample(calPt.x, elapsed);
+                analyzerY.addSample(calPt.y, elapsed);
             }
         }
 
-        visualizer.draw(display, tracker.getPoints(), elapsed, samplenumber, calibrator, analyzer.getFrequency());
+        visualizer.draw(display, tracker.getPoints(), elapsed, samplenumber, calibrator, analyzerX.getFrequency(), analyzerY.getFrequency());
 
         imshow("TrackXY", display);
 

@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <sstream>
 
-void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long long elapsed_ms, int sample_count, const Calibrator& calibrator, float frequency) {
+void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long long elapsed_ms, int sample_count, const Calibrator& calibrator, float freqX, float freqY) {
     if (nightMode) {
         img = cv::Scalar::all(0);
     }
@@ -39,18 +39,24 @@ void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long
         ss << "Y: " << std::fixed << std::setprecision(1) << points[0].y << " (cal: " << calPt.y << ")";
         drawTextWithShadow(ss.str(), cv::Point(10, 80));
 
-        if (frequency > 0) {
+        int yOffset = 100;
+        if (freqX > 0) {
             ss.str("");
-            ss << "Freq: " << std::fixed << std::setprecision(2) << frequency << " Hz";
-            drawTextWithShadow(ss.str(), cv::Point(10, 100));
+            ss << "Freq X: " << std::fixed << std::setprecision(2) << freqX << " Hz";
+            drawTextWithShadow(ss.str(), cv::Point(10, yOffset));
+            yOffset += 20;
+        }
+        if (freqY > 0) {
+            ss.str("");
+            ss << "Freq Y: " << std::fixed << std::setprecision(2) << freqY << " Hz";
+            drawTextWithShadow(ss.str(), cv::Point(10, yOffset));
+            yOffset += 20;
+        }
 
-            ss.str("");
-            ss << "Period: " << std::fixed << std::setprecision(2) << (1.0f / frequency) << " s";
-            drawTextWithShadow(ss.str(), cv::Point(10, 120));
-            
-            drawTextWithShadow("Status: TRACKING (OSCILLATING)", cv::Point(10, 140));
+        if (freqX > 0 || freqY > 0) {
+            drawTextWithShadow("Status: TRACKING (OSCILLATING)", cv::Point(10, yOffset));
         } else {
-            drawTextWithShadow("Status: TRACKING", cv::Point(10, 100));
+            drawTextWithShadow("Status: TRACKING", cv::Point(10, yOffset));
         }
         
         // Draw crosshair on primary point
