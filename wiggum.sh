@@ -39,10 +39,20 @@ while true; do
     OUTPUT=$(gemini --approval-mode=yolo --skip-trust -p "$(cat TASKS.md)" 2>&1)
     echo "$OUTPUT"
     
-    # Check if we hit the quota limit using bash string matching to avoid pipe policy issues
+    # Check if we hit the quota limit
     if [[ "$OUTPUT" == *"QUOTA_EXHAUSTED"* ]]; then
-        echo "Quota exhausted! Pausing for 65 seconds before retrying..."
-        sleep 65
+        # Parse retryDelayMs from the output using bash regex
+        pattern='retryDelayMs:[[:space:]]*([0-9.]+)'
+        if [[ "$OUTPUT" =~ $pattern ]]; then
+            DELAY_MS="${BASH_REMATCH[1]}"
+            # Convert ms to seconds and round up using python
+            DELAY_SEC=$(python3 -c "import math; print(math.ceil($DELAY_MS / 1000.0))")
+            echo "Quota exhausted! Pausing for $DELAY_SEC seconds (from retryDelayMs)..."
+            sleep "$DELAY_SEC"
+        else
+            echo "Quota exhausted, but no retryDelayMs found. Pausing for 60 seconds..."
+            sleep 60
+        fi
     else
         # Wait a moment to prevent CPU hammering if things fail fast
         sleep 2
