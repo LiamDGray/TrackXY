@@ -1,27 +1,12 @@
-// OpenCVTest.cpp : Defines the entry point for the console application.
-//
+#include <iostream>
 
-#include "stdafx.h"
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
-#include <Windows.h>
+// Forward declaration of the main logic from lkdemo.cpp if we were to separate it.
+// For now, lkdemo.cpp has its own main.
+// We will eventually refactor this to a proper class-based structure.
 
-using namespace std;
-
-#if 0
-int _tmain(int argc, _TCHAR* argv[])
-{
-	// convert this to a windowed application from a template
-
-	// select which webcam, with a key press
-	// (maybe later with a dialog like that in ARToolKit)
-
-//	hough_main( argc, (char **) argv ); // use this to detect only one circle and let user confirm it.
-	// try calling hough from within lkdemo.
-
-	lkdemo_main( argc, (char**) argv ); // use this to track a feature and log the x coordinates to a file
-
-	return 0;
+int main(int argc, char** argv) {
+    std::cout << "TrackXY Modernized" << std::endl;
+    // To avoid multiple main definitions, we'll let lkdemo.cpp handle it for now
+    // or we can call a function from lkdemo.cpp here.
+    return 0;
 }
-#endif

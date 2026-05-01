@@ -17,9 +17,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-# Source files (we'll add more as we refactor)
-# For now, let's try to compile a placeholder or the main file after some minimal fixes
-add_executable(trackxy TrackX.cpp lkdemo.cpp)
+# Source files
+# For now, lkdemo.cpp contains the main loop
+add_executable(trackxy lkdemo.cpp)
 target_link_libraries(trackxy PRIVATE ${OpenCV_LIBS})
 
 # Tests

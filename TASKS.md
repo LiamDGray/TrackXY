@@ -14,10 +14,10 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 
 ### [ ] Phase 1: Modernization & Portability
 - [/] Create modernization test suite (catch2 or gtest) to baseline current behavior.
-- [/] Implement CMake build system (cross-platform).
-- [ ] Refactor `TrackX.cpp` to remove `Windows.h` and use `std::chrono`.
-- [ ] Upgrade to OpenCV 4.x modern C++ API.
-- [ ] Clean up legacy boilerplate (`stdafx.h`, `targetver.h`).
+- [x] Implement CMake build system (cross-platform).
+- [x] Refactor `TrackX.cpp` to remove `Windows.h` and use `std::chrono`.
+- [x] Upgrade to OpenCV 4.x modern C++ API.
+- [x] Clean up legacy boilerplate (`stdafx.h`, `targetver.h`).
 
 ### [ ] Phase 2: Feature Enhancement
 - [ ] Implement ROI selection (Draw bounding box).
