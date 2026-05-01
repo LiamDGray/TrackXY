@@ -6,8 +6,8 @@
 #include <chrono>
 #include <ctime>
 #include "src/Tracker.hpp"
-
 #include "src/InputHandler.hpp"
+#include "src/Visualizer.hpp"
 
 using namespace cv;
 using namespace std;
@@ -64,6 +64,7 @@ int main(int argc, char** argv) {
     outfile << "0, 0, 0, 0, Start: " << std::ctime(&now_time);
 
     PointTracker tracker;
+    Visualizer visualizer;
     Mat frame, gray, display;
     bool nightMode = false;
     int samplenumber = 0;
@@ -78,29 +79,24 @@ int main(int argc, char** argv) {
         frame.copyTo(display);
         cvtColor(frame, gray, COLOR_BGR2GRAY);
 
-        if (nightMode) display = Scalar::all(0);
+        visualizer.setNightMode(nightMode);
 
+        long long elapsed = 0;
         if (tracker.isTracking()) {
             tracker.update(gray);
             const auto& points = tracker.getPoints();
             
-            for (const auto& pt : points) {
-                circle(display, pt, 3, Scalar(0, 255, 0), -1);
-            }
-            
             if (!points.empty()) {
-                // Main tracked point in red
-                circle(display, points[0], 3, Scalar(0, 0, 255), -1);
-                circle(display, points[0], 10, Scalar(255, 255, 255), 1);
-                
                 auto current_time = std::chrono::steady_clock::now();
-                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+                elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
                 
                 samplenumber++;
                 outfile << samplenumber << "," << elapsed << "," 
                         << points[0].x << "," << points[0].y << ",tracking" << endl;
             }
         }
+
+        visualizer.draw(display, tracker.getPoints(), elapsed, samplenumber);
 
         imshow("TrackXY", display);
 
