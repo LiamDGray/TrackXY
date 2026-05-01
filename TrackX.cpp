@@ -14,53 +14,22 @@
 #include "src/Calibrator.hpp"
 #include "src/DualAxisAnalyzer.hpp"
 
+#include "src/CLIParser.hpp"
+
 using namespace cv;
 using namespace std;
 
-void print_help(const char* progName) {
-    cout << "\nTrackXY Modernized\n"
-         << "Usage: " << progName << " [options]\n\n"
-         << "Options:\n"
-         << "  -i, --input <src>      Input source (camera index or video file, default: 0)\n"
-         << "  -o, --output <file>    Output CSV filename (default: output.csv)\n"
-         << "  -c, --calibration <f>  Calibration YAML file (default: calibration.yml)\n"
-         << "  -n, --night             Start in night mode\n"
-         << "  -h, --help              Show this help message\n\n"
-         << "Controls:\n"
-         << "  Esc - Quit\n"
-         << "  r   - Select ROI and re-initialize\n"
-         << "  c   - Clear tracking\n"
-         << "  n   - Toggle night mode\n"
-         << "  s   - Save calibration to file\n"
-         << "  o   - Set origin at current tracking point\n"
-         << "  k   - Set scale (pixels to units)\n" << endl;
-}
-
 int main(int argc, char** argv) {
-    string inputSource = "0";
-    string filename = "output.csv";
-    string calibFile = "calibration.yml";
-    bool nightMode = false;
-
-    for (int i = 1; i < argc; ++i) {
-        string arg = argv[i];
-        if (arg == "-h" || arg == "--help") {
-            print_help(argv[0]);
-            return 0;
-        } else if ((arg == "-i" || arg == "--input") && i + 1 < argc) {
-            inputSource = argv[++i];
-        } else if ((arg == "-o" || arg == "--output") && i + 1 < argc) {
-            filename = argv[++i];
-        } else if ((arg == "-c" || arg == "--calibration") && i + 1 < argc) {
-            calibFile = argv[++i];
-        } else if (arg == "-n" || arg == "--night") {
-            nightMode = true;
-        } else {
-            cerr << "Unknown argument: " << arg << endl;
-            print_help(argv[0]);
-            return -1;
-        }
+    CLIArguments args = CLIParser::parse(argc, argv);
+    
+    if (args.help) {
+        return 0;
     }
+
+    string inputSource = args.inputSource;
+    string filename = args.outputFile;
+    string calibFile = args.calibFile;
+    bool nightMode = args.nightMode;
 
     if (filename.find(".csv") == string::npos) filename += ".csv";
 

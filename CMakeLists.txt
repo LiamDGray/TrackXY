@@ -37,6 +37,7 @@ add_executable(unit_tests
     tests/test_calibrator.cpp
     tests/test_analyzer.cpp
     tests/test_tracker.cpp
+    tests/test_cli.cpp
     src/Tracker.cpp 
     src/InputHandler.cpp
     src/Visualizer.cpp

@@ -35,7 +35,7 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 - [x] Fix primary point identity (prevent jumping to chaperones).
 - [x] Implement dual-axis (XY) oscillation analysis.
 - [x] Add support for saving/loading calibration.
-- [ ] Improve CLI argument parsing (add flags, better help).
+- [x] Improve CLI argument parsing (add flags, better help).
 
 ### [ ] Phase 5: Polishing & Documentation
 - [ ] Refactor main function into a TrackApp class.
