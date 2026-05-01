@@ -20,9 +20,9 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 - [x] Clean up legacy boilerplate (stdafx.h, targetver.h).
 
 
-### [ ] Phase 2: Feature Enhancement
-- [ ] Implement ROI selection (Draw bounding box).
-- [ ] Add support for video file input.
+### [x] Phase 2: Feature Enhancement
+- [x] Implement ROI selection (Draw bounding box).
+- [x] Add support for video file input.
 - [ ] Implement live data visualization overlay.
 
 ---

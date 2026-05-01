@@ -292,3 +292,43 @@ events:
       Running the CXX compiler's linker: "/usr/bin/ld" "-v"
       GNU ld (GNU Binutils for Debian) 2.44
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.31/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/usr/share/cmake-3.31/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/usr/share/cmake-3.31/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "build/_deps/catch2-src/CMake/CatchMiscFunctions.cmake:12 (check_cxx_compiler_flag)"
+      - "build/_deps/catch2-src/CMake/CatchMiscFunctions.cmake:119 (add_cxx_flag_if_supported_to_targets)"
+      - "build/_deps/catch2-src/src/CMakeLists.txt:342 (add_build_reproducibility_settings)"
+    checks:
+      - "Performing Test HAVE_FLAG__ffile_prefix_map__home_liam_src_TrackXY_build__deps_catch2_src__"
+    directories:
+      source: "/home/liam/src/TrackXY/build/CMakeFiles/CMakeScratch/TryCompile-uT4qli"
+      binary: "/home/liam/src/TrackXY/build/CMakeFiles/CMakeScratch/TryCompile-uT4qli"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/liam/src/TrackXY/build/_deps/catch2-src/extras;/home/liam/src/TrackXY/build/_deps/catch2-src/CMake"
+    buildResult:
+      variable: "HAVE_FLAG__ffile_prefix_map__home_liam_src_TrackXY_build__deps_catch2_src__"
+      cached: true
+      stdout: |
+        Change Dir: '/home/liam/src/TrackXY/build/CMakeFiles/CMakeScratch/TryCompile-uT4qli'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_58640/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_58640.dir/build.make CMakeFiles/cmTC_58640.dir/build
+        gmake[1]: Entering directory '/home/liam/src/TrackXY/build/CMakeFiles/CMakeScratch/TryCompile-uT4qli'
+        Building CXX object CMakeFiles/cmTC_58640.dir/src.cxx.o
+        /usr/bin/c++ -DHAVE_FLAG__ffile_prefix_map__home_liam_src_TrackXY_build__deps_catch2_src__  -std=gnu++17   -ffile-prefix-map=/home/liam/src/TrackXY/build/_deps/catch2-src/= -o CMakeFiles/cmTC_58640.dir/src.cxx.o -c /home/liam/src/TrackXY/build/CMakeFiles/CMakeScratch/TryCompile-uT4qli/src.cxx
+        Linking CXX executable cmTC_58640
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_58640.dir/link.txt --verbose=1
+        /usr/bin/c++ CMakeFiles/cmTC_58640.dir/src.cxx.o -o cmTC_58640
+        gmake[1]: Leaving directory '/home/liam/src/TrackXY/build/CMakeFiles/CMakeScratch/TryCompile-uT4qli'
+        
+      exitCode: 0
+...

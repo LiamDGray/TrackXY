@@ -11,6 +11,17 @@ void PointTracker::autoInitialize(const cv::Mat& grayFrame) {
     grayFrame.copyTo(prevGray);
 }
 
+void PointTracker::initializeWithROI(const cv::Mat& grayFrame, cv::Rect roi) {
+    cv::Mat mask = cv::Mat::zeros(grayFrame.size(), CV_8UC1);
+    mask(roi).setTo(255);
+    
+    cv::goodFeaturesToTrack(grayFrame, points, config.maxPoints, 0.01, 10, mask, 3, false, 0.04);
+    if (!points.empty()) {
+        cv::cornerSubPix(grayFrame, points, config.subPixWinSize, cv::Size(-1, -1), config.termcrit);
+    }
+    grayFrame.copyTo(prevGray);
+}
+
 void PointTracker::update(const cv::Mat& grayFrame) {
     if (points.empty()) {
         grayFrame.copyTo(prevGray);

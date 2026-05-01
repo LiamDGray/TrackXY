@@ -5,16 +5,21 @@
 #include <vector>
 
 /**
+ * @brief Configuration for PointTracker.
+ */
+struct TrackerConfig {
+    int maxPoints = 3;
+    cv::Size winSize = cv::Size(31, 31);
+    cv::Size subPixWinSize = cv::Size(10, 10);
+    cv::TermCriteria termcrit = cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03);
+};
+
+/**
  * @brief Encapsulates the Lucas-Kanade optical flow tracking logic.
  */
 class PointTracker {
 public:
-    struct Config {
-        int maxPoints = 3;
-        cv::Size winSize = cv::Size(31, 31);
-        cv::Size subPixWinSize = cv::Size(10, 10);
-        cv::TermCriteria termcrit = cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03);
-    };
+    using Config = TrackerConfig;
 
     explicit PointTracker(Config config = Config());
 
@@ -23,6 +28,13 @@ public:
      * @param grayFrame Grayscale image to detect features in.
      */
     void autoInitialize(const cv::Mat& grayFrame);
+
+    /**
+     * @brief Initialize tracking within a specific region of interest.
+     * @param grayFrame Grayscale image to detect features in.
+     * @param roi The rectangle defining the region of interest.
+     */
+    void initializeWithROI(const cv::Mat& grayFrame, cv::Rect roi);
 
     /**
      * @brief Update the positions of tracked points.
