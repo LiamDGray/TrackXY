@@ -4,6 +4,8 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <vector>
+#include <string>
 #include "src/Tracker.hpp"
 #include "src/InputHandler.hpp"
 #include "src/Visualizer.hpp"
@@ -14,38 +16,49 @@
 using namespace cv;
 using namespace std;
 
-static void help() {
+void print_help(const char* progName) {
     cout << "\nTrackXY Modernized\n"
-         << "Usage: trackxy <camera_number_or_video_file> <output_filename>\n"
+         << "Usage: " << progName << " [options]\n\n"
+         << "Options:\n"
+         << "  -i, --input <src>      Input source (camera index or video file, default: 0)\n"
+         << "  -o, --output <file>    Output CSV filename (default: output.csv)\n"
+         << "  -c, --calibration <f>  Calibration YAML file (default: calibration.yml)\n"
+         << "  -n, --night             Start in night mode\n"
+         << "  -h, --help              Show this help message\n\n"
          << "Controls:\n"
-         << "\tEsc - Quit\n"
-         << "\tr   - Select ROI and re-initialize\n"
-         << "\tc   - Clear tracking\n"
-         << "\tn   - Toggle night mode\n" << endl;
+         << "  Esc - Quit\n"
+         << "  r   - Select ROI and re-initialize\n"
+         << "  c   - Clear tracking\n"
+         << "  n   - Toggle night mode\n" << endl;
 }
 
 int main(int argc, char** argv) {
-    string inputSource;
-    string filename;
+    string inputSource = "0";
+    string filename = "output.csv";
+    string calibFile = "calibration.yml";
+    bool nightMode = false;
 
-    help();
-
-    if (argc >= 2) {
-        inputSource = argv[1];
-    } else {
-        cout << "Camera number [0] or video file: ";
-        getline(cin, inputSource);
-        if (inputSource.empty()) inputSource = "0";
+    for (int i = 1; i < argc; ++i) {
+        string arg = argv[i];
+        if (arg == "-h" || arg == "--help") {
+            print_help(argv[0]);
+            return 0;
+        } else if ((arg == "-i" || arg == "--input") && i + 1 < argc) {
+            inputSource = argv[++i];
+        } else if ((arg == "-o" || arg == "--output") && i + 1 < argc) {
+            filename = argv[++i];
+        } else if ((arg == "-c" || arg == "--calibration") && i + 1 < argc) {
+            calibFile = argv[++i];
+        } else if (arg == "-n" || arg == "--night") {
+            nightMode = true;
+        } else {
+            cerr << "Unknown argument: " << arg << endl;
+            print_help(argv[0]);
+            return -1;
+        }
     }
 
-    if (argc >= 3) {
-        filename = argv[2];
-    } else {
-        cout << "Output filename (.csv): ";
-        getline(cin, filename);
-        if (filename.empty()) filename = "output";
-        if (filename.find(".csv") == string::npos) filename += ".csv";
-    }
+    if (filename.find(".csv") == string::npos) filename += ".csv";
 
     auto cap_ptr = InputHandler::open(inputSource);
     if (!cap_ptr->isOpened()) {
@@ -62,17 +75,18 @@ int main(int argc, char** argv) {
     PointTracker tracker;
     Visualizer visualizer;
     Calibrator calibrator;
-    if (calibrator.load("calibration.yml")) {
-        cout << "Loaded calibration from calibration.yml" << endl;
+    if (calibrator.load(calibFile)) {
+        cout << "Loaded calibration from " << calibFile << endl;
     }
+    
     OscillationAnalyzer analyzerX;
     OscillationAnalyzer analyzerY;
     Mat frame, gray, display;
-    bool nightMode = false;
     int samplenumber = 0;
     auto start_time = std::chrono::steady_clock::now();
 
     namedWindow("TrackXY", 1);
+    cout << "Press 'r' to select ROI and start tracking." << endl;
 
     for (;;) {
         cap >> frame;
@@ -109,7 +123,6 @@ int main(int argc, char** argv) {
         if (c == 'n') nightMode = !nightMode;
         if (c == 'c') tracker.clear();
         if (c == 'r') {
-            // Select ROI
             Rect roi = selectROI("TrackXY", frame, false, false);
             if (roi.width > 0 && roi.height > 0) {
                 tracker.initializeWithROI(gray, roi);
