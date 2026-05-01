@@ -2,7 +2,7 @@
 
 This file tracks the progress of the TrackXY modernization. The Wiggum loop driver uses this file to determine the next steps.
 
-## Status: 🏗️ INITIALIZING
+## Status: 🏗️ PHASE 1 IN PROGRESS
 
 ---
 
@@ -10,11 +10,11 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 - [x] Create `.gemini/settings.json` and `.gemini/hooks/after_agent.sh` for post-turn hooks.
 - [x] Create and test `wiggum.sh` driver script.
 - [x] Establish project constitution (`GEMINI.md`).
-- [ ] Initialize `main` branch and initial commit.
+- [x] Initialize `main` branch and initial commit.
 
 ### [ ] Phase 1: Modernization & Portability
-- [ ] Create modernization test suite (catch2 or gtest) to baseline current behavior.
-- [ ] Implement CMake build system (cross-platform).
+- [/] Create modernization test suite (catch2 or gtest) to baseline current behavior.
+- [/] Implement CMake build system (cross-platform).
 - [ ] Refactor `TrackX.cpp` to remove `Windows.h` and use `std::chrono`.
 - [ ] Upgrade to OpenCV 4.x modern C++ API.
 - [ ] Clean up legacy boilerplate (`stdafx.h`, `targetver.h`).

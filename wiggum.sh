@@ -4,6 +4,9 @@
 
 echo "Starting the Wiggum Loop for TrackXY..."
 
+# Ensure the hook script is executable
+chmod +x .gemini/hooks/after_agent.sh
+
 while true; do
     echo "--- New Iteration ---"
     
@@ -15,14 +18,12 @@ while true; do
     fi
 
     # Invoke Gemini CLI with the tasks list
-    # The agent is expected to read TASKS.md and proceed.
-    gemini -p "$(cat TASKS.md)"
-    
-    # The AfterAgent hook in .gemini/settings.json will fire
-    # but the loop proceeds based on the CLI exit.
+    # --approval-mode=yolo: Allow autonomous tool execution
+    # --skip-trust: Bypass interactive trust checks
+    gemini --approval-mode=yolo --skip-trust -p "$(cat TASKS.md)"
     
     # Wait a moment to prevent CPU hammering if things fail fast
-    sleep 1
+    sleep 2
 done
 
 echo "Wiggum Loop finished."

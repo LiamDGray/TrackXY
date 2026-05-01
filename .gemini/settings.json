@@ -2,9 +2,14 @@
   "hooks": {
     "AfterAgent": [
       {
-        "name": "wiggum-signal",
-        "type": "command",
-        "command": "bash .gemini/hooks/after_agent.sh"
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "wiggum-signal",
+            "type": "command",
+            "command": "bash .gemini/hooks/after_agent.sh"
+          }
+        ]
       }
     ]
   }
