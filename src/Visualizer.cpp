@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <sstream>
 
-void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long long elapsed_ms, int sample_count) {
+void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long long elapsed_ms, int sample_count, const Calibrator& calibrator, float frequency) {
     if (nightMode) {
         img = cv::Scalar::all(0);
     }
@@ -29,15 +29,29 @@ void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long
     drawTextWithShadow(ss.str(), cv::Point(10, 40));
 
     if (!points.empty()) {
+        cv::Point2f calPt = calibrator.transform(points[0]);
+
         ss.str("");
-        ss << "X: " << std::fixed << std::setprecision(1) << points[0].x;
+        ss << "X: " << std::fixed << std::setprecision(1) << points[0].x << " (cal: " << calPt.x << ")";
         drawTextWithShadow(ss.str(), cv::Point(10, 60));
 
         ss.str("");
-        ss << "Y: " << std::fixed << std::setprecision(1) << points[0].y;
+        ss << "Y: " << std::fixed << std::setprecision(1) << points[0].y << " (cal: " << calPt.y << ")";
         drawTextWithShadow(ss.str(), cv::Point(10, 80));
 
-        drawTextWithShadow("Status: TRACKING", cv::Point(10, 100));
+        if (frequency > 0) {
+            ss.str("");
+            ss << "Freq: " << std::fixed << std::setprecision(2) << frequency << " Hz";
+            drawTextWithShadow(ss.str(), cv::Point(10, 100));
+
+            ss.str("");
+            ss << "Period: " << std::fixed << std::setprecision(2) << (1.0f / frequency) << " s";
+            drawTextWithShadow(ss.str(), cv::Point(10, 120));
+            
+            drawTextWithShadow("Status: TRACKING (OSCILLATING)", cv::Point(10, 140));
+        } else {
+            drawTextWithShadow("Status: TRACKING", cv::Point(10, 100));
+        }
         
         // Draw crosshair on primary point
         cv::drawMarker(img, points[0], cv::Scalar(0, 0, 255), cv::MARKER_CROSS, 20, 1);

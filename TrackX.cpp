@@ -2,12 +2,14 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
-#include <fstream>
 #include <chrono>
 #include <ctime>
 #include "src/Tracker.hpp"
 #include "src/InputHandler.hpp"
 #include "src/Visualizer.hpp"
+#include "src/DataLogger.hpp"
+#include "src/Calibrator.hpp"
+#include "src/OscillationAnalyzer.hpp"
 
 using namespace cv;
 using namespace std;
@@ -52,19 +54,15 @@ int main(int argc, char** argv) {
     }
     cv::VideoCapture& cap = *cap_ptr;
 
-    ofstream outfile(filename);
-    if (!outfile.is_open()) {
-        cerr << "Error: Could not open " << filename << " for writing" << endl;
+    DataLogger logger(filename);
+    if (!logger.isOpen()) {
         return -1;
     }
 
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-    outfile << "samplenumber, millseconds, x, y, status" << endl;
-    outfile << "0, 0, 0, 0, Start: " << std::ctime(&now_time);
-
     PointTracker tracker;
     Visualizer visualizer;
+    Calibrator calibrator;
+    OscillationAnalyzer analyzer;
     Mat frame, gray, display;
     bool nightMode = false;
     int samplenumber = 0;
@@ -91,12 +89,13 @@ int main(int argc, char** argv) {
                 elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
                 
                 samplenumber++;
-                outfile << samplenumber << "," << elapsed << "," 
-                        << points[0].x << "," << points[0].y << ",tracking" << endl;
+                cv::Point2f calPt = calibrator.transform(points[0]);
+                logger.log(samplenumber, elapsed, points[0].x, points[0].y, calPt.x, calPt.y, "tracking");
+                analyzer.addSample(calPt.x, elapsed);
             }
         }
 
-        visualizer.draw(display, tracker.getPoints(), elapsed, samplenumber);
+        visualizer.draw(display, tracker.getPoints(), elapsed, samplenumber, calibrator, analyzer.getFrequency());
 
         imshow("TrackXY", display);
 
@@ -115,6 +114,5 @@ int main(int argc, char** argv) {
         }
     }
 
-    outfile.close();
     return 0;
 }

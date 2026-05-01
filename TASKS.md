@@ -2,7 +2,7 @@
 
 This file tracks the progress of the TrackXY modernization. The Wiggum loop driver uses this file to determine the next steps.
 
-## Status: 🏗️ PHASE 2 IN PROGRESS
+## Status: ✅ PHASE 3 COMPLETE
 
 ---
 
@@ -23,7 +23,19 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 ### [x] Phase 2: Feature Enhancement
 - [x] Implement ROI selection (Draw bounding box).
 - [x] Add support for video file input.
-- [ ] Implement live data visualization overlay.
+- [x] Implement live data visualization overlay.
+
+### [x] Phase 3: Robustness & Calibration
+- [x] Implement a dedicated `DataLogger` class for CSV output.
+- [x] Add unit calibration (pixels to real-world units).
+- [x] Improve "chaperone" point handling.
+- [x] Add basic data analysis (peak detection, frequency estimation).
+
+### [ ] Phase 4: Advanced Analysis & UX
+- [ ] Fix primary point identity (prevent jumping to chaperones).
+- [ ] Implement dual-axis (XY) oscillation analysis.
+- [ ] Add support for saving/loading calibration.
+- [ ] Improve CLI argument parsing (add flags, better help).
 
 ---
 

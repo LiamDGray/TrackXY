@@ -61,5 +61,6 @@ public:
 private:
     Config config;
     cv::Mat prevGray;
+    cv::Mat mask;
     std::vector<cv::Point2f> points;
 };

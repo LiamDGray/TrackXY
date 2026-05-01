@@ -18,7 +18,13 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 
 # Source files
-add_executable(trackxy TrackX.cpp src/Tracker.cpp src/InputHandler.cpp src/Visualizer.cpp)
+add_executable(trackxy 
+    TrackX.cpp 
+    src/Tracker.cpp 
+    src/InputHandler.cpp 
+    src/Visualizer.cpp
+    src/DataLogger.cpp
+)
 target_link_libraries(trackxy PRIVATE ${OpenCV_LIBS})
 
 # Tests
@@ -27,9 +33,14 @@ add_executable(unit_tests
     tests/test_main.cpp 
     tests/test_video_input.cpp 
     tests/test_visualizer.cpp
+    tests/test_logger.cpp
+    tests/test_calibrator.cpp
+    tests/test_analyzer.cpp
+    tests/test_tracker.cpp
     src/Tracker.cpp 
     src/InputHandler.cpp
     src/Visualizer.cpp
+    src/DataLogger.cpp
 )
 target_link_libraries(unit_tests PRIVATE Catch2::Catch2WithMain ${OpenCV_LIBS})
 

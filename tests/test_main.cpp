@@ -71,6 +71,29 @@ TEST_CASE("PointTracker basic lifecycle", "[tracker]") {
         }
     }
     
+    SECTION("Point recovery") {
+        cv::Mat frame = cv::Mat::zeros(100, 100, CV_8UC1);
+        // Three dots
+        cv::circle(frame, cv::Point(20, 20), 2, cv::Scalar(255), -1);
+        cv::circle(frame, cv::Point(50, 50), 2, cv::Scalar(255), -1);
+        cv::circle(frame, cv::Point(80, 80), 2, cv::Scalar(255), -1);
+
+        tracker.autoInitialize(frame);
+        REQUIRE(tracker.getPoints().size() == 3);
+
+        // Next frame: move two dots, remove one, add a new one elsewhere
+        cv::Mat frame2 = cv::Mat::zeros(100, 100, CV_8UC1);
+        cv::circle(frame2, cv::Point(21, 21), 2, cv::Scalar(255), -1);
+        cv::circle(frame2, cv::Point(51, 51), 2, cv::Scalar(255), -1);
+        // Dot at 80, 80 is gone.
+        // New dot at 70, 70
+        cv::circle(frame2, cv::Point(70, 70), 2, cv::Scalar(255), -1);
+
+        tracker.update(frame2);
+        // It should still have 3 points because it recovered one
+        CHECK(tracker.getPoints().size() == 3);
+    }
+
     SECTION("Clear") {
         cv::Mat frame = cv::Mat::zeros(100, 100, CV_8UC1);
         cv::rectangle(frame, cv::Point(40, 40), cv::Point(60, 60), cv::Scalar(255), -1);
