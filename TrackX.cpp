@@ -6,12 +6,13 @@
 #include <ctime>
 #include <vector>
 #include <string>
+#include <limits>
 #include "src/Tracker.hpp"
 #include "src/InputHandler.hpp"
 #include "src/Visualizer.hpp"
 #include "src/DataLogger.hpp"
 #include "src/Calibrator.hpp"
-#include "src/OscillationAnalyzer.hpp"
+#include "src/DualAxisAnalyzer.hpp"
 
 using namespace cv;
 using namespace std;
@@ -29,7 +30,10 @@ void print_help(const char* progName) {
          << "  Esc - Quit\n"
          << "  r   - Select ROI and re-initialize\n"
          << "  c   - Clear tracking\n"
-         << "  n   - Toggle night mode\n" << endl;
+         << "  n   - Toggle night mode\n"
+         << "  s   - Save calibration to file\n"
+         << "  o   - Set origin at current tracking point\n"
+         << "  k   - Set scale (pixels to units)\n" << endl;
 }
 
 int main(int argc, char** argv) {
@@ -79,8 +83,7 @@ int main(int argc, char** argv) {
         cout << "Loaded calibration from " << calibFile << endl;
     }
     
-    OscillationAnalyzer analyzerX;
-    OscillationAnalyzer analyzerY;
+    DualAxisAnalyzer dualAnalyzer;
     Mat frame, gray, display;
     int samplenumber = 0;
     auto start_time = std::chrono::steady_clock::now();
@@ -109,12 +112,18 @@ int main(int argc, char** argv) {
                 samplenumber++;
                 cv::Point2f calPt = calibrator.transform(points[0]);
                 logger.log(samplenumber, elapsed, points[0].x, points[0].y, calPt.x, calPt.y, "tracking");
-                analyzerX.addSample(calPt.x, elapsed);
-                analyzerY.addSample(calPt.y, elapsed);
+                dualAnalyzer.addSample(calPt.x, calPt.y, elapsed);
             }
         }
 
-        visualizer.draw(display, tracker.getPoints(), elapsed, samplenumber, calibrator, analyzerX.getFrequency(), analyzerY.getFrequency());
+        AnalysisResults results;
+        results.freqX = dualAnalyzer.getFreqX();
+        results.freqY = dualAnalyzer.getFreqY();
+        results.ampX = dualAnalyzer.getAmpX();
+        results.ampY = dualAnalyzer.getAmpY();
+        results.phaseDiff = dualAnalyzer.getPhaseDifference();
+
+        visualizer.draw(display, tracker.getPoints(), elapsed, samplenumber, calibrator, results);
 
         imshow("TrackXY", display);
 
@@ -122,6 +131,30 @@ int main(int argc, char** argv) {
         if (c == 27) break;
         if (c == 'n') nightMode = !nightMode;
         if (c == 'c') tracker.clear();
+        if (c == 's') {
+            calibrator.save(calibFile);
+            cout << "Calibration saved to " << calibFile << endl;
+        }
+        if (c == 'o') {
+            if (tracker.isTracking() && !tracker.getPoints().empty()) {
+                calibrator.setOrigin(tracker.getPoints()[0]);
+                cout << "Origin set to " << tracker.getPoints()[0] << endl;
+            } else {
+                cout << "Wait for tracking to start before setting origin." << endl;
+            }
+        }
+        if (c == 'k') {
+            float dist_units;
+            cout << "Enter real-world distance for 100 pixels: ";
+            if (cin >> dist_units) {
+                calibrator.setScale(100.0f, dist_units);
+                cout << "Scale set: 100 px = " << dist_units << " units" << endl;
+            } else {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid input." << endl;
+            }
+        }
         if (c == 'r') {
             Rect roi = selectROI("TrackXY", frame, false, false);
             if (roi.width > 0 && roi.height > 0) {

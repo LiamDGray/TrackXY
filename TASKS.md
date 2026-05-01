@@ -37,6 +37,12 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 - [x] Add support for saving/loading calibration.
 - [ ] Improve CLI argument parsing (add flags, better help).
 
+### [ ] Phase 5: Polishing & Documentation
+- [ ] Refactor main function into a TrackApp class.
+- [ ] Add Doxygen-style documentation to all headers.
+- [ ] Update README.md with usage examples and calibration guide.
+- [ ] Final code cleanup (remove unused headers, fix linting).
+
 ---
 
 ## Instructions for Wiggum Loop

@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <sstream>
 
-void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long long elapsed_ms, int sample_count, const Calibrator& calibrator, float freqX, float freqY) {
+void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long long elapsed_ms, int sample_count, const Calibrator& calibrator, const AnalysisResults& analysis) {
     if (nightMode) {
         img = cv::Scalar::all(0);
     }
@@ -40,20 +40,27 @@ void Visualizer::draw(cv::Mat& img, const std::vector<cv::Point2f>& points, long
         drawTextWithShadow(ss.str(), cv::Point(10, 80));
 
         int yOffset = 100;
-        if (freqX > 0) {
+        if (analysis.freqX > 0) {
             ss.str("");
-            ss << "Freq X: " << std::fixed << std::setprecision(2) << freqX << " Hz";
+            ss << "Freq X: " << std::fixed << std::setprecision(2) << analysis.freqX << " Hz (Amp: " << analysis.ampX << ")";
             drawTextWithShadow(ss.str(), cv::Point(10, yOffset));
             yOffset += 20;
         }
-        if (freqY > 0) {
+        if (analysis.freqY > 0) {
             ss.str("");
-            ss << "Freq Y: " << std::fixed << std::setprecision(2) << freqY << " Hz";
+            ss << "Freq Y: " << std::fixed << std::setprecision(2) << analysis.freqY << " Hz (Amp: " << analysis.ampY << ")";
             drawTextWithShadow(ss.str(), cv::Point(10, yOffset));
             yOffset += 20;
         }
 
-        if (freqX > 0 || freqY > 0) {
+        if (analysis.freqX > 0 && analysis.freqY > 0) {
+            ss.str("");
+            ss << "Phase Diff: " << std::fixed << std::setprecision(1) << analysis.phaseDiff << " deg";
+            drawTextWithShadow(ss.str(), cv::Point(10, yOffset));
+            yOffset += 20;
+        }
+
+        if (analysis.freqX > 0 || analysis.freqY > 0) {
             drawTextWithShadow("Status: TRACKING (OSCILLATING)", cv::Point(10, yOffset));
         } else {
             drawTextWithShadow("Status: TRACKING", cv::Point(10, yOffset));

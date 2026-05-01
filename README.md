@@ -43,9 +43,12 @@ make
 - **r**: Select a Region of Interest (ROI) and re-initialize tracking.
 - **c**: Clear current tracking points.
 - **n**: Toggle "night mode" (black background for better contrast).
+- **s**: Save current calibration to file.
+- **o**: Set origin at current tracking point.
+- **k**: Set scale (prompts for distance corresponding to 100 pixels).
 
 ### Calibration
-Currently, calibration is set to 1:1 (pixels). Future versions will include interactive calibration tools.
+Calibration maps pixels to real-world units. Use 'k' to set the scale and 'o' to set the origin. Press 's' to persist these settings to a YAML file (default: `calibration.yml`), which will be automatically loaded on next start.
 
 ## Output Format
 The program logs data to a CSV file with the following columns:
