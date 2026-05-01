@@ -43,8 +43,8 @@ This file tracks the progress of the TrackXY modernization. The Wiggum loop driv
 - [x] Update README.md with usage examples and calibration guide.
 - [x] Final code cleanup (remove unused headers, fix linting).
 
-### Phase 6: Legal & Compliance
-- [x] Add license headers to all source and header files.
+### [x] Phase 6: Legal & Compliance
+- [x] Add license headers to all source and header files. (Updated to full AGPLv3 headers)
 
 ---
 

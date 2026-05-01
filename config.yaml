@@ -1,0 +1,55 @@
+model_list:
+
+  # ── PRO chain ─────────────────────────────────────────────
+  - model_name: pro
+    litellm_params:
+      model: gemini/gemini-3.1-pro
+      api_key: os.environ/GEMINI_API_KEY
+      rpm: 5          # check your actual free-tier quota in AI Studio
+      order: 1
+
+  - model_name: pro
+    litellm_params:
+      model: gemini/gemini-2.5-pro
+      api_key: os.environ/GEMINI_API_KEY
+      rpm: 5
+      order: 2
+
+  - model_name: pro
+    litellm_params:
+      model: deepseek/deepseek-v4-pro
+      api_key: os.environ/DEEPSEEK_API_KEY
+      api_base: https://api.deepseek.com
+      order: 3
+
+  # ── FLASH chain ───────────────────────────────────────────
+  - model_name: flash
+    litellm_params:
+      model: gemini/gemini-3-flash
+      api_key: os.environ/GEMINI_API_KEY
+      rpm: 15         # free-tier flash limits are typically higher
+      order: 1
+
+  - model_name: flash
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_key: os.environ/GEMINI_API_KEY
+      rpm: 15
+      order: 2
+
+  - model_name: flash
+    litellm_params:
+      model: deepseek/deepseek-v4-flash
+      api_key: os.environ/DEEPSEEK_API_KEY
+      api_base: https://api.deepseek.com
+      order: 3
+
+router_settings:
+  routing_strategy: simple-shuffle
+  cooldown_time: 60   # seconds a 429'd deployment sits out
+  allowed_fails: 1    # one failure → immediate cooldown
+  num_retries: 0      # don't retry before falling through to next order
+
+litellm_settings:
+  drop_params: true   # silently drop params unsupported by a given provider
+  
