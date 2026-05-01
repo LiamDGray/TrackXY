@@ -1,23 +1,38 @@
+/*
+ * TrackXY - Optical Point Tracking and Analysis Tool
+ * Copyright (c) 2012, 2026 Liam D. Gray
+ * Released under GNU Affero GPL v3
+ */
 #pragma once
 
 #include <vector>
 #include <deque>
 
 /**
- * @brief Analyzes a stream of values to estimate oscillation frequency.
+ * @brief Analyzes a stream of values to estimate oscillation properties like frequency and amplitude.
  */
 class OscillationAnalyzer {
 public:
+    /**
+     * @brief Represents a single data point in the analysis window.
+     */
     struct Sample {
-        float value;
-        long long time;
+        float value;    ///< The value of the sample.
+        long long time; ///< The timestamp of the sample in milliseconds.
     };
 
+    /**
+     * @brief Represents a zero-crossing point identified in the data stream.
+     */
     struct Crossing {
-        long long time;
-        bool rising;
+        long long time; ///< Estimated time of the crossing in milliseconds.
+        bool rising;    ///< True if it's a rising edge (crossing from negative to positive relative to mean).
     };
 
+    /**
+     * @brief Construct a new OscillationAnalyzer object.
+     * @param windowSize The maximum number of samples to store for analysis.
+     */
     OscillationAnalyzer(size_t windowSize = 500) : maxWindow(windowSize) {}
 
     /**
@@ -36,25 +51,32 @@ public:
 
     /**
      * @brief Get the estimated frequency in Hz.
+     * @return Frequency in Hz, or 0.0 if not enough data.
      */
     float getFrequency() const { return frequency; }
 
     /**
-     * @brief Get the estimated amplitude (peak).
+     * @brief Get the estimated amplitude (peak value relative to mean).
+     * @return Amplitude in same units as input values.
      */
     float getAmplitude() const { return amplitude; }
 
     /**
-     * @brief Get the estimated period in seconds.
+     * @brief Get the estimated oscillation period.
+     * @return Period in seconds.
      */
     float getPeriod() const { return (frequency > 0) ? (1.0f / frequency) : 0.0f; }
 
     /**
-     * @brief Get the crossing times (relative to the mean).
+     * @brief Get the detected zero-crossing points in the current window.
+     * @return Vector of Crossing structures.
      */
     const std::vector<Crossing>& getCrossings() const { return crossings; }
 
 private:
+    /**
+     * @brief Performs the core analysis: mean calculation, amplitude estimation, and zero-crossing detection.
+     */
     void updateAnalysis() {
         if (samples.size() < 10) return;
 

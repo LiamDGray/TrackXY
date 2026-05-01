@@ -24,6 +24,7 @@ add_executable(trackxy
     src/InputHandler.cpp 
     src/Visualizer.cpp
     src/DataLogger.cpp
+    src/TrackApp.cpp
 )
 target_link_libraries(trackxy PRIVATE ${OpenCV_LIBS})
 
@@ -42,6 +43,7 @@ add_executable(unit_tests
     src/InputHandler.cpp
     src/Visualizer.cpp
     src/DataLogger.cpp
+    src/TrackApp.cpp
 )
 target_link_libraries(unit_tests PRIVATE Catch2::Catch2WithMain ${OpenCV_LIBS})
 

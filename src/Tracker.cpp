@@ -1,6 +1,10 @@
+/*
+ * TrackXY - Optical Point Tracking and Analysis Tool
+ * Copyright (c) 2012, 2026 Liam D. Gray
+ * Released under GNU Affero GPL v3
+ */
 #include "Tracker.hpp"
 #include <opencv2/imgproc.hpp>
-#include <iostream>
 
 PointTracker::PointTracker(Config cfg) : config(cfg) {}
 

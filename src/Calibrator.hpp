@@ -1,3 +1,8 @@
+/*
+ * TrackXY - Optical Point Tracking and Analysis Tool
+ * Copyright (c) 2012, 2026 Liam D. Gray
+ * Released under GNU Affero GPL v3
+ */
 #pragma once
 
 #include <opencv2/core.hpp>
