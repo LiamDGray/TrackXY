@@ -105,7 +105,10 @@ function solveLinear(A, b) {
 }
 
 /**
- * Fit H such that dst ≈ H · src. Direct linear transform with Hartley
+ * Fit H such that dst ≈ H · src.
+ *
+ * For measurement calibration, pass `src` = image pixels and `dst` = physical
+ * positions, so the fitted H maps pixels to units. Direct linear transform with Hartley
  * normalisation, least squares over all pairs (exact for four).
  */
 export function fitHomography(src, dst) {

@@ -1,32 +1,50 @@
 # TrackXY documentation
 
-Four documents, one per kind of reader.
+Organised by what you are trying to do, in the four modes that documentation usually fails to
+separate: learning, doing, looking up, and understanding. If you only read one thing, read the
+[explanation](explanation/the-number-is-not-the-evidence.md) — it is the argument for everything else.
 
-| Document | Read it if you want | Length |
-|---|---|---|
-| [Technical report](technical-report.md) | The whole picture: method, what is verified, what is not, and where this could go | ~15 min |
-| [Architecture](architecture.md) | To change the code: components, contracts, data flow, test strategy | ~8 min |
-| [Measurement provenance](measurement-provenance.md) | To make a result file checkable, or to combine TrackXY with capture attestation | ~8 min |
-| [Next iteration](design/next-iteration.md) | To change the *instrument*: estimator, parallax, marker placement, platform | ~12 min |
-| [README](../README.md) | To build and run it | ~3 min |
+## Learning: take it for a spin
 
-## Reading paths
+**[Your first measurement](tutorials/first-measurement.md)** — ten minutes, no camera, no build step.
+Generate a synthetic recording with a known answer, analyse it twice, and watch a calibration model
+turn a circle into an ellipse and back.
 
-- **Evaluating the project?** Report §2 (overview) → §4 (verification status) → §7 (where it could
-  go). §4 is the honest section; read it before believing any accuracy claim anywhere else.
-- **Using it in a lab?** README build and usage → report §3 (method and assumptions) → calibration
-  guide in the README. Then decide whether §6 limitations are acceptable for your apparatus.
-- **Auditing a result someone gave you?** [Measurement provenance](measurement-provenance.md) →
-  `tools/measurement_receipt.py verify`.
-- **Teaching with it?** Report §7.2, then the calibration and output sections of the README.
-- **Planning the next version?** [Next iteration](design/next-iteration.md) — measured trade-offs for
-  the estimator, the calibration geometry, the marker placement and the platform question.
+## Doing: a specific job
 
-## The one-paragraph version
+**[Calibrate a tilted camera](how-to/calibrate-a-tilted-camera.md)** — when the camera cannot be made
+square-on to the target plane and the numbers still have to be in millimetres. Includes the
+troubleshooting table that would have saved me a 9% error.
 
-TrackXY tracks one visual target through a webcam or video file with pyramidal Lucas–Kanade optical
-flow, converts pixel coordinates to physical units through an explicit origin and scale, and derives
-oscillation frequency, amplitude and inter-axis phase from a moving window. It is designed so that
-losing the target stops the measurement rather than silently switching to a different feature, and so
-that a result file can be bound to the inputs that produced it. It has not been benchmarked against
-known ground truth; see [§4](technical-report.md#4-verification-status).
+Also useful on the job: `tools/measurement_receipt.py` to bind a result to its inputs
+([provenance](measurement-provenance.md)), and `js/src/cli.js` to analyse a CSV without a camera.
+
+## Looking up: contracts and schemas
+
+**[Architecture](architecture.md)** — components, guarantees, frame lifecycle, CSV schema, test
+strategy, extension points. Read this before changing the code.
+
+## Understanding: why it is like this
+
+**[The number is not the evidence](explanation/the-number-is-not-the-evidence.md)** — three defects
+that produced plausible wrong answers, the measurements that exposed them, and the case for
+documentation that says what an instrument cannot do.
+
+**[Technical report](technical-report.md)** — the formal account: method, assumptions, verification
+status (including what is *not* verified), limitations, and three directions for the project.
+
+**[Next iteration](design/next-iteration.md)** — measured trade-offs for replacing the estimator,
+changing the calibration geometry, moving the marker to the rotation axis, and rewriting in
+JavaScript.
+
+**[Measurement provenance](measurement-provenance.md)** — threat model, receipt schema, and how
+receipts compose with [RealPeep](https://github.com/LiamDGray/realpeep) capture attestation.
+
+## Reference material
+
+| Path | Contents |
+|---|---|
+| [`README.md`](../README.md) | Build, run, keyboard controls, calibration guide |
+| [`js/`](../js/) | Portable numerical core: estimators, calibration, angle, CLI, benchmarks |
+| [`docs/samples/`](samples/) | A synthetic recording and its two calibrations |
+| [`tools/measurement_receipt.py`](../tools/measurement_receipt.py) | Emit and verify measurement receipts |
