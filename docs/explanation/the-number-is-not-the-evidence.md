@@ -193,7 +193,7 @@ worth making.
 ## What the instrument was actually for
 
 The rig was not a demonstration. It was built to reproduce a published torsion-balance protocol: a
-15 × 35 cm steel-mesh hemisphere on a short monofilament, a subject seated beneath it, a camera
+15 × 35 cm steel-mesh hemisphere on a short monofilament, an object under test beneath it, a camera
 side-on, ten measurements per second, and a natural period of about thirty seconds.
 
 That protocol does not ask for a frequency. It asks where the centre of oscillation sits and how far

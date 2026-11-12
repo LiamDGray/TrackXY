@@ -15,8 +15,8 @@ This file records the rule, the reason, and the check.
 |---|---|
 | The source paper (PDF) | Third-party copyrighted article. Redistribution is a licensing problem no matter how it is framed |
 | The parts list (PDF) | Third-party document containing its author's name, email address, and purchase links. Not mine to republish |
-| Raw session logs with a subject present | Human-subjects material; consent did not cover publication |
-| Anything naming a subject | Same |
+| Raw captures and session figures | Session data from a private experiment; not mine to publish, and it carries whatever the session carries |
+| Anything identifying a participant, or describing what is under the pendulum | Same |
 
 Both documents are in `~/src/private/trackxy-replication/`, with a note there on what they are and
 why they are not in the repository.
@@ -38,7 +38,7 @@ to be checkable, without leading with the claim.
 
 ```bash
 # 1. Nothing private is tracked.
-git ls-files | grep -Ei 'hansen|parts list|subject|consent' || echo "clean"
+git ls-files | grep -Ei 'hansen|parts list|participant|consent|session' || echo "clean"
 
 # 2. Nothing private is anywhere in history (including deleted commits and reflogs).
 git rev-list --objects --all | grep -Ei 'hansen|parts list' || echo "clean history"
@@ -54,7 +54,13 @@ git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objec
 If step 2 ever finds something, the fix is a history rewrite *before* the first push, not a deletion
 afterwards: a pushed commit is a published commit, mirrors and forks included.
 
+## What stays, and why
+
+Apparatus photographs and UI screenshots stay: a pointer, a dome, a tracking overlay. They show how the
+instrument is built, not what a session measured. The line is not "anything from that project" — it is
+"anything that carries a session".
+
 ## Once public
 
-Do not add subject material, session recordings, or third-party documents later. A commit that is
+Do not add session captures, participant material, or third-party documents later. A commit that is
 reverted is still in the history, and a public repository's history is part of the publication.

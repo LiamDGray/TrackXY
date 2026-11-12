@@ -105,10 +105,10 @@ The program logs data to a CSV file with the following columns:
 - `x_cal`, `y_cal`: Calibrated coordinates in your chosen units.
 - `status`: Tracking status information.
 
-> **Note on `sample.csv`:** the checked-in file is a 2012 capture and uses the legacy header
-> (`samplenumber, millseconds, x, y, numclicks, comments or notes`). It is kept as a historical
-> artefact, not as a format reference — the current schema is the one above, written by
-> `DataLogger`.
+> **Note on the legacy schema:** the 2012 build wrote
+> `samplenumber, millseconds, x, y, numclicks, comments or notes` (note the misspelling). The current
+> schema is the one above, written by `DataLogger`. `docs/samples/legacy-format-example.csv` shows the
+> old layout; it is synthetic, so nobody mistakes it for a measurement.
 
 ## Analysing a recording without a camera
 

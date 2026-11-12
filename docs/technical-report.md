@@ -189,8 +189,9 @@ science is right", and it is the only one worth making.
 3. **Interactive by design.** Batch processing of many clips means scripting GUI key events, which is
    not supported. This is the largest obstacle to using TrackXY as a research tool.
 4. **No accuracy benchmark** (§4).
-5. **`sample.csv` in the repository predates the current schema** and is preserved as a historical
-   artefact, not a format reference.
+5. **The 2012 capture format differs from the current schema** (`millseconds`, `numclicks`,
+   free-text notes). A synthetic example of the old layout is kept in `docs/samples/`; real captures
+   are not in the repository.
 
 ## 7. Where this could go
 

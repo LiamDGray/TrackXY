@@ -1,11 +1,11 @@
 # Instrumenting a torsion-balance protocol
 
-*What this software has to measure when the experiment is a suspended mesh hemisphere, a seated
-subject, and a period of thirty seconds.*
+*What this software has to measure when the experiment is a suspended mesh hemisphere, a very slow
+oscillation, and a period of thirty seconds.*
 
 The apparatus this project was built around is not a generic pendulum demonstration. It is a
 replication rig for a published torsion-balance protocol — a steel-mesh hemisphere suspended by a
-short filament, filmed side-on, with a subject seated beneath it — and the quantities that protocol
+short filament, filmed side-on, with an object under test beneath it — and the quantities that protocol
 reports are not the ones a single damped-sinusoid fit produces. This document records the protocol's
 parameters, what the tool computes for each reported quantity, and the limits of what any of it can
 establish.
@@ -28,7 +28,7 @@ repository — they are third-party documents — so the parameters below are re
 | Torsion constant | 2,240 dyne·cm/rad = 39 dyne·cm/deg | Figure 3 |
 | Scale | 1° of rotation ≈ 0.3 cm of displacement | text |
 | Force scale | 1° ≈ 4.6 mg equivalent | text |
-| Run structure | ~6 min free oscillation to establish baseline, then ~28 min segments with a subject, then ~43 min after departure | text, Figures 4–5 |
+| Run structure | ~6 min free oscillation to establish baseline, then ~28 min test segments, then ~43 min after the condition ends | text, Figures 4–5 |
 
 My rig kept the layout and replaced the capture and analysis software. The target was inverted — a
 black map-pin pointer on a white paper strip taped around the circumference, rather than a white dot on
@@ -119,21 +119,21 @@ the blind search happily trades a late onset for a long time constant.
 **The onset is only partly identifiable.** An exponential fitted from a later start still fits, with
 the same τ, because the starting value is free. The tool estimates onset from the first window that
 moves 10% of the total shift, which is a convention, not a measurement. If onset matters to the
-argument, log the event — when the subject sat down, when they left — rather than inferring it.
+argument, log the event — when the condition began and when it ended — rather than inferring it.
 
 ## What the software cannot establish
 
 - **Cause.** It measures the motion of a suspended mass. A force, a draught, a temperature gradient,
   a floor vibration, or a change in the room's air density all produce motion. Attributing the motion
   to a specific mechanism is outside the instrument's competence, and the protocol's own controls —
-  grounding both the collector and the subject, ruling out air currents — are the reason to trust any
+  grounding the collector and the object under test, ruling out air currents — are the reason to trust any
   of it.
-- **Blinding.** A run in which the operator knows when the subject sat down is not blinded. The
+- **Blinding.** A run in which the operator knows when the condition began is not blinded. The
   software can timestamp the event and compute from a fixed script; it cannot remove the operator's
   expectation from the analysis.
-- **A stable baseline.** A single run cannot distinguish a slow drift caused by the subject from one
-  caused by the room warming up over half an hour. Baseline stability is an experimental-design
-  question, and it needs repeat runs of equal length with no subject.
+- **A stable baseline.** A single run cannot distinguish a slow drift caused by the condition under
+  test from one caused by the room warming up over half an hour. Baseline stability is an experimental-design
+  question, and it needs repeat runs of equal length with nothing under the pendulum.
 - **Anything about the hypothesis under test.** See above.
 
 ## Reproducibility
