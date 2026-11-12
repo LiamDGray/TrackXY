@@ -1,3 +1,10 @@
 build/
 __pycache__/
 *.pyc
+
+# Private replication material lives outside the repository; these patterns are a
+# backstop against an accidental `git add`. See PUBLISHING.md.
+docs/private/
+*Hansen*.pdf
+*Parts List*.pdf
+*.session.json

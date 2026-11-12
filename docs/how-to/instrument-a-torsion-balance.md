@@ -10,8 +10,9 @@ reports are not the ones a single damped-sinusoid fit produces. This document re
 parameters, what the tool computes for each reported quantity, and the limits of what any of it can
 establish.
 
-It describes instrumentation. It does not evaluate the paper's conclusions, and nothing here should be
-read as an endorsement of them.
+It describes instrumentation. It does not evaluate the protocol's conclusions, and nothing here should
+be read as an endorsement of them. The source paper and the parts list are not redistributed with this
+repository — they are third-party documents — so the parameters below are recorded here instead.
 
 ## The apparatus as published
 
@@ -29,10 +30,32 @@ read as an endorsement of them.
 | Force scale | 1° ≈ 4.6 mg equivalent | text |
 | Run structure | ~6 min free oscillation to establish baseline, then ~28 min segments with a subject, then ~43 min after departure | text, Figures 4–5 |
 
-My rig kept the hardware and layout and replaced the capture and analysis software. The target was
-inverted — a black map-pin pointer on a white paper strip taped around the circumference, rather than a
-white dot on bare mesh. That inversion is worth noting: the strip removes the mesh's periodic texture
-across the tracking band, which otherwise defeats corner detection.
+My rig kept the layout and replaced the capture and analysis software. The target was inverted — a
+black map-pin pointer on a white paper strip taped around the circumference, rather than a white dot on
+bare mesh. That inversion is worth noting: the strip removes the mesh's periodic texture across the
+tracking band, which otherwise defeats corner detection.
+
+### The dome is not the same, and that changes the force scale
+
+The published rig used a black 220 g food cover with a 1.7 cm filament. Mine is the Camping World
+replacement: red, 180 g, 14 in diameter × 6 in high, Intersource part D14-983, with a filament of
+2–2.5 cm chosen to restore a 30–40 s period.
+
+That substitution is legitimate for the motion measurements and **invalid for the published force
+calibration**. Torsion constant scales with `1/L` for the filament and the force scale scales with κ, so
+a longer filament and a lighter dome give a different mg-per-degree figure:
+
+- κ scales as `1/L`: 2.25 cm instead of 1.7 cm is about 24% lower.
+- The published 4.6 mg/deg therefore does not transfer. From `κ = 4π²I/T²` with a thin hemispherical
+  shell (`I ≈ ⅔mr²`, 0.18 kg, r = 0.175 m) and T = 30 s, κ ≈ 1.6 × 10⁻³ N·m/rad against the
+  published 2.24 × 10⁻³, and the force scale falls to roughly 3.3–3.6 mg/deg.
+- The published figure appears to apply the equivalent force at the hemisphere's centre of mass
+  (`r/2` = 8.75 cm), which reproduces their numbers to within a millimetre of lever arm. Apply yours at
+  the same point or the comparison is meaningless.
+
+Measure κ on the actual assembly — add known masses to the rim and fit ω against the added moment of
+inertia, as the source paper does — rather than scaling the published value. The displacement
+conversion (1° ≈ 0.305 cm at r = 175 mm) is geometric and does transfer.
 
 ## The four reported quantities
 
@@ -111,7 +134,7 @@ argument, log the event — when the subject sat down, when they left — rather
 - **A stable baseline.** A single run cannot distinguish a slow drift caused by the subject from one
   caused by the room warming up over half an hour. Baseline stability is an experimental-design
   question, and it needs repeat runs of equal length with no subject.
-- **Anything about the field hypothesis.** See above.
+- **Anything about the hypothesis under test.** See above.
 
 ## Reproducibility
 
