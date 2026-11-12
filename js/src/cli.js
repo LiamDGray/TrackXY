@@ -98,7 +98,9 @@ function run(options) {
   if (!options.csv) throw new Error('--csv is required')
   const csvText = readFileSync(options.csv, 'utf8')
   const calibration = options.calib ? loadCalibration(options.calib) : null
-  const result = analyze({ csvText, calibration, units: options.units })
+  const radiusMm = options.radius ? Number(options.radius) : null
+  if (options.radius && !(radiusMm > 0)) throw new Error('--radius must be a positive number')
+  const result = analyze({ csvText, calibration, units: options.units, radiusMm })
 
   if (options.json) {
     process.stdout.write(JSON.stringify(result, null, 2) + '\n')

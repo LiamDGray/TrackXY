@@ -17,7 +17,11 @@ node src/cli.js synthesize --out sample.csv [--tilt 25] [--radius 50] [--seconds
 
 npm run bench:estimator   # SNR sweep, both estimators
 npm run bench:accuracy    # closed-loop: affine vs homography over radius
+npm run bench:cylinder    # side-view chord vs asin correction over amplitude
 ```
+
+Pass `--radius <mm>` when the marker travels around a circumference: the tool then fits the angle
+`asin(x/r)` instead of the chord and reports `rotation.amplitudeDeg`, warning above 30° amplitude.
 
 `analyze` prints a report with per-axis estimates, standard errors, phase interpretation and warnings;
 `--json` emits the full structure. `synthesize` writes a CSV plus both calibration files, which is how

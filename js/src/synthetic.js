@@ -155,3 +155,63 @@ export function toCsv(rows, { units = 'mm', affine = null } = {}) {
     )
   }
 }
+
+/**
+ * Rotation about a vertical axis, seen from the side.
+ *
+ * This is the geometry of the original apparatus: a marker on a strip around the
+ * circumference of a dome, filmed from roughly two feet away. The marker travels
+ * on a *cylinder*, so its horizontal image position is a chord, `x = r·sin θ`,
+ * not an arc. For small oscillations the two are nearly equal; at ±45° the chord
+ * reads 10% low, and at ±75° it reads 26% low.
+ *
+ * `simulateRotation` produces the true angle; `observeCylinder` projects it
+ * through the camera, including the perspective term that a planar calibration
+ * cannot see.
+ */
+export function simulateRotation({
+  frequency = 0.8,
+  amplitudeDeg = 20,
+  damping = 0,
+  phase = 0,
+  seconds = 12,
+  fps = 60,
+  noisePx = 0.2,
+  seed = 20261112,
+  radialNoisePx = 0,
+} = {}) {
+  const rand = makeRng(seed)
+  const n = Math.round(seconds * fps)
+  const amplitude = (amplitudeDeg * Math.PI) / 180
+  const truth = []
+  for (let i = 0; i < n; i += 1) {
+    const t = i / fps
+    truth.push({ t, theta: amplitude * Math.exp(-damping * t) * Math.sin(2 * Math.PI * frequency * t + phase) })
+  }
+  return { truth, rand, noisePx, radialNoisePx }
+}
+
+/** Camera pixels for a rotation, as the marker appears on the cylinder's near side. */
+export function observeCylinder(
+  trajectory,
+  { radiusMm = 152.5, distanceMm = 610, focalPx = 600, cx = 320, cy = 240 } = {},
+) {
+  const rows = []
+  for (const point of trajectory.truth) {
+    const theta = point.theta
+    const X = radiusMm * Math.sin(theta)
+    const Z = distanceMm + radiusMm * (1 - Math.cos(theta))
+    const xPx = cx + (focalPx * X) / Z
+    const yPx = cy + trajectory.noisePx * trajectory.rand()
+    rows.push({
+      milliseconds: Math.round(point.t * 1000),
+      xPx: xPx + trajectory.noisePx * trajectory.rand() + trajectory.radialNoisePx * 0,
+      yPx,
+      truth: point,
+    })
+  }
+  // Affine calibration of the near-side plane: the scale a careful operator
+  // would measure, and the model that silently ignores the perspective term.
+  const calibration = { model: 'affine', origin: [cx, cy], pixelsPerUnit: focalPx / distanceMm }
+  return { rows, calibration }
+}

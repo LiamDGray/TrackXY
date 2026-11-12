@@ -16,6 +16,10 @@ turn a circle into an ellipse and back.
 square-on to the target plane and the numbers still have to be in millimetres. Includes the
 troubleshooting table that would have saved me a 9% error.
 
+**[Measure rotation from a side view](how-to/measure-rotation-from-a-side-view.md)** — a marker on a
+circumference gives you a chord, not an angle. How to recover the angle, where the correction stops
+working, and when to change the geometry instead.
+
 Also useful on the job: `tools/measurement_receipt.py` to bind a result to its inputs
 ([provenance](measurement-provenance.md)), and `js/src/cli.js` to analyse a CSV without a camera.
 

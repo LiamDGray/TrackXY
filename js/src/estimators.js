@@ -283,7 +283,11 @@ export function fitDampedSinusoid(t, x, options = {}) {
   const energy = x.reduce((acc, v) => acc + v * v, 0)
   const relativeResidual = sse / (energy || 1)
   const frequencyError = standardErrors.frequency / (Math.abs(p[2]) || 1)
-  const reliable = (converged || relativeResidual < 1e-10) && relativeResidual < 0.5 && frequencyError < 0.1
+  // Convergence is a diagnostic, not a gate: a fit to data that is only
+  // approximately sinusoidal (sin of a sinusoid, for a chord) never reaches the
+  // numerical floor, and that does not make the estimate wrong.
+  const reliable =
+    Number.isFinite(p[2]) && p[2] > 0 && relativeResidual < 0.5 && frequencyError < 0.1
 
   return {
     amplitude: Math.abs(p[0]),

@@ -48,6 +48,7 @@ Logging happens only when a point exists, so a gap in the CSV means "no valid me
 | `OscillationAnalyzer` | No frequency before 10 samples and 4 mean crossings | A two-crossing estimate reports the sample rate, not the oscillation |
 | `DataLogger` | One row per logged sample; header written at construction | Downstream parsing breaks silently |
 | `DualAxisAnalyzer` | Phase in `[−180°, +180°]`, Y relative to X | A wrapped or unnormalised phase reads as a different physical mode |
+| `analyseRotation` | `θ = asin(x/r)`, warned above 30° amplitude | A chord reported as an angle is 10% low at 45° |
 | `tools/measurement_receipt.py` | `verify` recomputes every recorded digest and chain | A tampered result file passes as genuine |
 
 The first two carry the most weight. Everything else can be re-derived from the CSV; a switched
@@ -79,6 +80,27 @@ cv::Point2f transform(cv::Point2f p) const { return (p - origin) * (1.0f / pixel
 `k` prompts for the distance corresponding to 100 pixels and calls `setScale(100.0f, distance)`.
 There is no rotation, perspective, or distortion term — see
 [limitations](technical-report.md#6-limitations).
+
+## Two measurement geometries
+
+The calibration and the analysis assume different things depending on where the marker is, and
+confusing the two is the most common way to get a confident wrong answer.
+
+**Plane, viewed from above** (`MODEL_AXIS`, the top-down case). The marker rotates in place on a
+plane; a calibration homography maps pixels to that plane; the fitted value is an angle directly.
+
+**Cylinder, viewed from the side** (the original apparatus: a pointer on a strip around a
+circumference). The marker's horizontal position is a chord, `x = r·sin θ`. Analysis in millimetres is
+correct but is not an angle; pass `radiusMm` and the pipeline fits `θ = asin(x/r)` instead, reporting
+`rotation.amplitudeDeg`. The inversion is good to about 1% below 20°; above 30° a perspective residual
+appears and the pipeline says so.
+
+| Observable | Side view (cylinder) | Top view (plane) |
+|---|---|---|
+| Horizontal position | `r·sin θ` — chord | `r·sin θ` in plane coordinates, corrected by homography |
+| Angle | `asin(x/r)`, approximate under perspective | direct |
+| Fails when | amplitude large, marker near the silhouette | camera tilted and calibration is affine |
+| Missing information | direction, unless the marker is asymmetric | none within the plane |
 
 ## Analysis
 
