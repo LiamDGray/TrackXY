@@ -89,8 +89,37 @@ do not use this calibration; see the table below.
 | Error is small, but scale is consistently off by a few % | Printed square is not its nominal size | Measure the print with a ruler and use that number |
 | Straight edges near the frame border look curved | Barrel distortion from a wide lens | Undistort first (`cv::calibrateCamera`, one-time per camera), or restrict measurement to the central third |
 | Same recording gives different amplitudes in different runs | The tracked feature is changing, not the calibration | Check the tracker's identity contract in [architecture](../architecture.md) |
+| The tracker locks onto a repeating pattern instead of the marker | Periodic texture in the scene — mesh, grid, perforated sheet, fabric weave | Put a solid matte marker over the pattern, or mask the ROI to the marker alone; identical features are indistinguishable to corner detection and the tracker will hop between them |
 
-## 8. Verify against a known motion
+## 8. Scale the target to your apparatus
+
+The homography is scale-free, but three things are not: how much of the frame the motion occupies,
+the angular precision, and the absolute size of parallax errors at the edge.
+
+For a pinhole with focal length `f` pixels at distance `d`, a target of radius `r` in the measurement
+plane covers `r · f / d` pixels. At `f = 800 px` and `d = 600 mm`, a one-foot dome (305 mm across)
+spans 407 px — 85% of a 480 px frame height, which is too tight once you add a calibration target
+and tolerate a little drift.
+
+| Dome diameter | Radius in frame at 600 mm | at 900 mm | at 1200 mm |
+|---|---|---|---|
+| 305 mm (1 ft) | 85% of height | 56% | 42% |
+| 330 mm | 92% | 61% | 46% |
+| 380 mm | 106% — clipped | 70% | 53% |
+
+Rules of thumb:
+
+- Keep the swept motion within about **60% of the frame's short side**. That leaves room for the
+  target to leave and return, and keeps the measurement away from the distorted corners.
+- **A larger radius is more precise per pixel.** Angular resolution is `σ / (r · k)`; at 0.2 px of
+  centroid noise, a 50 mm radius gives 0.17°, a 152 mm radius gives 0.06°. Bigger is better, up to the
+  frame limit.
+- **A larger radius also multiplies absolute geometry errors.** Tilt and marker-height errors grow
+  linearly with radius, and barrel distortion is worst exactly where a large target sits. Moving the
+  camera back to fit the motion buys precision and costs scale; correct for both with the homography
+  rather than by turning the camera down.
+
+## 9. Verify against a known motion
 
 The cheapest end-to-end check is a circular target whose radius you can measure with a ruler. Sweep
 it, analyse, and confirm both axes report the same amplitude within their uncertainties. If they do

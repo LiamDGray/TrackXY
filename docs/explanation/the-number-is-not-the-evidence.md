@@ -17,9 +17,10 @@ The rebuilt tracker writes one row per frame: sample number, elapsed millisecond
 coordinates, calibrated millimetres, status. Calibration is two numbers — an origin and a scale —
 which an operator sets by pressing `o` and `k` on a live preview.
 
-For the pendulum I built a circular target: a marker that sweeps a 50 mm circle at 0.8 Hz. If the
-instrument is honest, every number it reports has a true value I already know. That is the whole point
-of a synthetic target, and it is the only reason I found any of this.
+For the apparatus I built a synthetic fixture: a marker that sweeps a 50 mm circle at 0.8 Hz, filmed
+through a camera model that I could tilt by a known angle. If the instrument is honest, every number
+it reports has a true value I already know. That is the whole point of a synthetic target, and it is
+the only reason I found any of this.
 
 The analysis reported:
 

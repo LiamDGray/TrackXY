@@ -27,6 +27,10 @@ Three files appear. The CSV is shaped exactly like a real run. The two calibrati
 same camera in two ways: a single scale about an origin (what the C++ build produces today) and a
 four-corner homography.
 
+The 50 mm radius is a fixture size chosen to fit a 640×480 frame, not a measurement of any real
+apparatus. If your target is bigger or farther away, [scale it before comparing
+numbers](../how-to/calibrate-a-tilted-camera.md#8-scale-the-target-to-your-apparatus).
+
 Write the truth down: **0.8 Hz, 50 mm, circular.**
 
 ## 2. Analyse it with the simple calibration
