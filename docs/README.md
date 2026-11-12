@@ -7,6 +7,7 @@ Four documents, one per kind of reader.
 | [Technical report](technical-report.md) | The whole picture: method, what is verified, what is not, and where this could go | ~15 min |
 | [Architecture](architecture.md) | To change the code: components, contracts, data flow, test strategy | ~8 min |
 | [Measurement provenance](measurement-provenance.md) | To make a result file checkable, or to combine TrackXY with capture attestation | ~8 min |
+| [Next iteration](design/next-iteration.md) | To change the *instrument*: estimator, parallax, marker placement, platform | ~12 min |
 | [README](../README.md) | To build and run it | ~3 min |
 
 ## Reading paths
@@ -18,6 +19,8 @@ Four documents, one per kind of reader.
 - **Auditing a result someone gave you?** [Measurement provenance](measurement-provenance.md) →
   `tools/measurement_receipt.py verify`.
 - **Teaching with it?** Report §7.2, then the calibration and output sections of the README.
+- **Planning the next version?** [Next iteration](design/next-iteration.md) — measured trade-offs for
+  the estimator, the calibration geometry, the marker placement and the platform question.
 
 ## The one-paragraph version
 

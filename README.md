@@ -20,6 +20,7 @@ Modernized version of the original TrackXY project (2012).
 | [docs/technical-report.md](docs/technical-report.md) | Method, assumptions, verification status, limitations, roadmap |
 | [docs/architecture.md](docs/architecture.md) | Components, contracts, frame lifecycle, output schema, test strategy |
 | [docs/measurement-provenance.md](docs/measurement-provenance.md) | Making a result checkable; composition with [RealPeep](https://github.com/LiamDGray/realpeep) capture attestation |
+| [docs/design/next-iteration.md](docs/design/next-iteration.md) | Measured case for the next version: estimator, homography calibration, axis marker, platform |
 
 Start with [docs/README.md](docs/README.md) if you are not sure which one you want.
 
@@ -43,6 +44,13 @@ make
 ```bash
 cd build
 ctest
+```
+
+The portable numerical core in [`js/`](js/) (estimators, calibration geometry, marker angle) has its
+own Node suite:
+
+```bash
+cd js && npm test && npm run bench
 ```
 
 The receipt tool has its own Python suite, which needs no OpenCV:
