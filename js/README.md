@@ -8,6 +8,21 @@ npm test    # 20 tests
 npm run bench   # Monte Carlo estimator comparison
 ```
 
+## CLI
+
+```bash
+# Analyse a recording (with or without a calibration)
+node src/cli.js analyze --csv out.csv --calib camera.calibration.json [--json]
+node src/cli.js synthesize --out sample.csv [--tilt 25] [--radius 50] [--seconds 12]
+
+npm run bench:estimator   # SNR sweep, both estimators
+npm run bench:accuracy    # closed-loop: affine vs homography over radius
+```
+
+`analyze` prints a report with per-axis estimates, standard errors, phase interpretation and warnings;
+`--json` emits the full structure. `synthesize` writes a CSV plus both calibration files, which is how
+the tutorial and the accuracy benchmark get a known answer without a camera.
+
 ## Why this exists
 
 Three reasons, in order:

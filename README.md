@@ -17,6 +17,9 @@ Modernized version of the original TrackXY project (2012).
 
 | Document | What it covers |
 |----------|----------------|
+| [docs/tutorials/first-measurement.md](docs/tutorials/first-measurement.md) | Ten-minute tour: analyse a synthetic recording, twice, and see what a calibration model changes |
+| [docs/how-to/calibrate-a-tilted-camera.md](docs/how-to/calibrate-a-tilted-camera.md) | Procedure for a camera that cannot be square-on, with troubleshooting |
+| [docs/explanation/the-number-is-not-the-evidence.md](docs/explanation/the-number-is-not-the-evidence.md) | Why the numbers can be fluent and wrong: three defects, measured |
 | [docs/technical-report.md](docs/technical-report.md) | Method, assumptions, verification status, limitations, roadmap |
 | [docs/architecture.md](docs/architecture.md) | Components, contracts, frame lifecycle, output schema, test strategy |
 | [docs/measurement-provenance.md](docs/measurement-provenance.md) | Making a result checkable; composition with [RealPeep](https://github.com/LiamDGray/realpeep) capture attestation |
@@ -104,6 +107,25 @@ The program logs data to a CSV file with the following columns:
 > (`samplenumber, millseconds, x, y, numclicks, comments or notes`). It is kept as a historical
 > artefact, not as a format reference — the current schema is the one above, written by
 > `DataLogger`.
+
+## Analysing a recording without a camera
+
+`js/` contains a dependency-free implementation of the analysis: estimator, calibration geometry and
+marker angle, plus a CLI.
+
+```bash
+cd js
+node src/cli.js synthesize --out /tmp/run.csv --tilt 25 --radius 50   # known-answer input
+node src/cli.js analyze --csv /tmp/run.csv --calib /tmp/run.calibration-homography.json
+```
+
+```
+  X  f = 0.8000 Hz ± 0.0000   amplitude = 49.993 mm ± 0.017
+  Y  f = 0.8000 Hz ± 0.0000   amplitude = 49.993 mm ± 0.018
+  phase (Y − X)  -90.00° ± 0.03°
+```
+
+`npm test` runs 36 tests; `npm run bench` reproduces the accuracy tables in the docs.
 
 ## Measurement receipts
 

@@ -94,6 +94,20 @@ distance.
 This is the single largest accuracy defect in the current system, and it is invisible to the user
 because the numbers look smooth.
 
+**Closed loop confirms it, and names the direction.** Simulating a 50 mm circular target at 0.8 Hz,
+25° tilt, 0.2 px tracking noise, and running the full analysis (`js/bench/accuracy.mjs`):
+
+| Model | X amplitude | Y amplitude | Frequency error |
+|---|---|---|---|
+| Uniform scale | 49.954 mm (−0.1%) | **45.340 mm (−9.3%)** | 0.00 mHz |
+| Homography | 49.993 mm (−0.01%) | 49.993 mm (−0.01%) | 0.01 mHz |
+
+The tilt compresses the axis along the tilt direction by `cos 25° = 0.906`, and the damage is confined
+to amplitude: **frequency is untouched**, because a linear distortion cannot change a rate. That is why
+the defect survived unnoticed — the number the experiment was designed to measure was correct. The
+instrument goes further and reports `phase = −89.97°`, i.e. "quadrature, elliptical orbit", which is a
+coherent physical description of an artefact.
+
 **Fix.** Four or more coplanar correspondences (printed square, chessboard corners, or ArUco corners)
 give a 3×3 homography by DLT. Implemented in [`js/src/calibration.js`](../../js/src/calibration.js)
 with Hartley normalisation; exact for four points, least-squares beyond.
@@ -187,8 +201,9 @@ provenance work.
 **Recommendation: hybrid, staged.**
 
 1. **Now:** the JS numerical core is the reference for *analysis* (it is tested against synthetic truth,
-   which the C++ analyser is not). The browser app consumes an exported CSV or a video file and runs
-   the §2/§3/§4 maths in-browser. This alone gives the shareable demo and the teaching tool.
+   which the C++ analyser is not) and it already ships a CLI: `js/src/cli.js analyze` takes a CSV and a
+   calibration, and `synthesize` produces known-answer input. A browser app would consume the same
+   modules; the analysis half of the rewrite is done and tested.
 2. **Next:** add the browser tracker behind a flag, and a **conformance suite**: three short clips,
    processed by both implementations, compared row-by-row within a stated tolerance. Divergence becomes
    a test failure rather than a surprise.
