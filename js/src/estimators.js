@@ -160,7 +160,7 @@ function invertMatrix(A) {
 }
 
 export function fitDampedSinusoid(t, x, options = {}) {
-  const { maxIterations = 200, tolerance = 1e-12 } = options
+  const { maxIterations = 200, tolerance = 1e-12, initialFrequency: seedFrequency = null } = options
   if (t.length !== x.length) throw new Error('time and value arrays must match')
   if (t.length < 12) throw new Error('need at least 12 samples for a five-parameter fit')
 
@@ -171,7 +171,10 @@ export function fitDampedSinusoid(t, x, options = {}) {
   // Initialise: offset, phase via linear least squares at γ = 0, frequency from
   // crossings or peak-to-trough.
   const c0 = mean(x)
-  const f0 = initialFrequency(t, x)
+  // A zero-crossing seed is useless once the oscillation has decayed into the
+  // noise: the crossings then count noise wiggles and the fit latches onto a high
+  // frequency. A spectral seed is stable in that regime.
+  const f0 = seedFrequency ?? initialFrequency(t, x)
   const omega0 = TWO_PI * f0
   let Sxx = 0
   let Sxy = 0
