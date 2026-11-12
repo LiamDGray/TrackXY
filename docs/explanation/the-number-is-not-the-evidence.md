@@ -3,87 +3,123 @@
 *What a rebuilt 2012 webcam tracker taught me about silent measurement errors, and about the kind of
 documentation that catches them.*
 
-In 2012 I pointed a webcam at a torsion pendulum, ran Intel's `lkdemo.cpp` sample, and wrote the
-coordinates to a CSV. It worked. Fourteen years later I rebuilt it properly — C++17, OpenCV 4, tests,
-calibration files — and discovered that the old version had been lying to me in a way I could not
-have caught by looking at the numbers.
+In 2012 I needed to measure the rotation of a dome — a mesh food cover, the kind that keeps flies off
+a plate at a picnic, a bit over a foot across. I taped a strip of white paper around its
+circumference, drew a black pointer on it shaped like a map pin, and put a webcam about two feet away,
+looking at that strip side-on. Then I ran Intel's `lkdemo.cpp` sample, tracked the pointer, and wrote
+its coordinates to a CSV. It worked. Fourteen years later I rebuilt it properly — C++17, OpenCV 4,
+tests, calibration files — and discovered that the old version had been telling me a number that was
+not the number I thought I was measuring.
 
 This is an account of three defects, each of which produced output that looked fine, and of what
 finally made them visible. It ends somewhere I did not expect: at documentation.
 
+## The apparatus was smarter than the software
+
+Two decisions in that 2012 rig were better than I knew at the time.
+
+The **white paper strip** is the first. A mesh dome is a regular grid of holes: to a corner detector it
+is thousands of identical features, and Lucas–Kanade cannot tell one wire crossing from the next. The
+strip removes the periodicity across the band where the pointer travels, giving the tracker one
+high-contrast feature against a uniform background. Without it, the tracker hops between holes and the
+data is nonsense. I chose the strip because it was the obvious way to see the pointer; it was also the
+only reason the measurement worked.
+
+The **pointer shape** is the second. A map-pin has a blob above a point, so it is easy to detect and it
+has an unambiguous tip — useful when the thing you want is a single coordinate.
+
+What the rig did not have was any notion of *angle*. The CSV recorded pixels; calibration turned them
+into millimetres. But a pointer travelling around the circumference of a cylinder does not move in a
+straight line, and its horizontal image position is not the distance it has travelled.
+
 ## The number that looked wrong because another number looked right
 
-The rebuilt tracker writes one row per frame: sample number, elapsed milliseconds, raw pixel
-coordinates, calibrated millimetres, status. Calibration is two numbers — an origin and a scale —
-which an operator sets by pressing `o` and `k` on a live preview.
-
-For the apparatus I built a synthetic fixture: a marker that sweeps a 50 mm circle at 0.8 Hz, filmed
-through a camera model that I could tilt by a known angle. If the instrument is honest, every number
-it reports has a true value I already know. That is the whole point of a synthetic target, and it is
-the only reason I found any of this.
-
-The analysis reported:
+For the geometry of that rig, the pointer's horizontal position is a chord:
 
 ```
-X  f = 0.8000 Hz   amplitude = 49.954 mm
-Y  f = 0.8000 Hz   amplitude = 45.340 mm
-phase (Y − X)  −89.97°
+x(t) = r · sin θ(t)
 ```
 
-Frequency correct to four decimal places. Phase correct to within a twentieth of a degree. Amplitude:
-one axis right, one axis short by 9.3%.
+with `r` the dome radius — about 152 mm for a one-foot dome. To recover the angle you have to invert
+that: `θ = asin(x / r)`. If you instead treat the chord in millimetres as an arc length, dividing by
+the radius gives an angle that is wrong by exactly the ratio `sin θ / θ`:
 
-A torsion pendulum swinging in a circle should have equal amplitudes on both axes. So the instrument
-was reporting an **elliptical orbit** — not with an error message, but with a confident geometric
-description. If I had been measuring an unfamiliar apparatus, or a smaller misalignment, I would have
-written "the orbit is slightly elliptical" in a lab notebook and moved on. The number would have
-entered the record as a physical fact about the pendulum rather than a fact about my camera.
-
-## Why it happened, and why nothing warned me
-
-The camera was 25° off the normal to the target plane. A translation and a single scale — which is
-what the 2012 code used, and what the 2026 rebuild inherited — cannot represent that. A tilt
-compresses one axis of the image by exactly `cos θ`; at 25° that is 0.906, so the measured amplitude
-on that axis is 9.4% short. The measurement is not noisy or random. It is *consistently* wrong, which
-is worse: averaging does not help, and repeated runs agree with each other.
-
-Two properties made this invisible to me:
-
-**It does not affect frequency.** A linear distortion scales position; it cannot change the rate at
-which position oscillates. So the headline number — the one I would have quoted, the one the
-experiment was designed to measure — was perfect. Everything downstream looked trustworthy because
-the first thing I checked was correct.
-
-**It masquerades as physics.** An ellipse *is* a possible orbit. The instrument did not report
-"amplitude mismatch, check your calibration"; it reported a 90° phase difference between axes with
-unequal amplitudes, which is a coherent description of elliptical motion. The failure mode was
-indistinguishable from a result.
-
-The fix is not a correction factor. It is a different calibration model. Four points on a printed
-square define a homography — the full projective mapping from the target plane to the image — and a
-homography removes tilt without knowing the angle:
-
-| Radius from calibration origin | Uniform scale + origin | Homography |
+| Amplitude | Chord reads | Apparent speed at the extreme |
 |---|---|---|
-| 10 mm | 0.55 mm error | < 0.001 mm |
-| 25 mm | 1.63 mm error | < 0.001 mm |
-| 50 mm | 4.06 mm error | < 0.001 mm |
-| 80 mm | 7.97 mm error | < 0.001 mm |
+| ±10° | 0.5% low | 98% |
+| ±20° | 2.0% low | 94% |
+| ±30° | 4.5% low | 87% |
+| ±45° | 10.0% low | 71% |
+| ±60° | 17.3% low | 50% |
+| ±75° | 26.2% low | 26% |
 
-Same data, same estimator, same tracker. The difference between a 9% error and a 0.01% error is one
-calibration model, and the reason I could not see it before is that nothing in the output said
-"amplitude is where this instrument is weakest."
+Two things about this table matter more than the numbers.
 
-## The second defect had a confidence interval
+First, **the error is systematic**. It is not noise; repeated runs agree with each other. Averaging
+does not help, and a confidence interval computed the usual way will be confidently wrong.
 
-The frequency number was correct in the run above, but not for the reason I assumed. The 2012 analyser
-finds where the signal crosses its own mean and takes the average half-period between crossings. That
-is a fine definition for a signal that never decays. A pendulum decays.
+Second, **it is invisible in the quantity you are most likely to quote**. Frequency is unaffected — a
+geometric distortion of position cannot change a rate. When I simulated this geometry at 0.8 Hz and
+amplitudes from 5° to 75°, the recovered frequency was within 0.1 mHz at every amplitude while the
+amplitude error grew from 1% to 20%. The number a torsion-pendulum experiment exists to measure — the
+period — was perfect. The number that tells you how hard you are driving it was the one drifting.
 
-On a damped signal, mean crossings are not evenly spaced; the envelope pulls them together. The
-resulting frequency estimate is biased, and the bias grows with damping. I measured it by fitting a
-damped sinusoid `A·e^(−γt)·cos(2πft + φ) + c` to the same data and comparing, over 200 trials at each
-noise level:
+The correction itself is one line, and it is enough up to about 20°:
+
+| True amplitude | `asin` inversion | Treating the chord as an arc |
+|---|---|---|
+| 10° | −0.3% | +0.3% |
+| 20° | −1.2% | −3.0% |
+| 30° | −2.7% | −7.3% |
+| 45° | −6.2% | −15.9% |
+| 60° | −11.8% | −26.3% |
+| 75° | −19.8% | −37.6% |
+
+The residual is perspective: the pointer is 152 mm closer to the camera at the front of the dome than
+at the sides, and `asin` does not know that. A full camera model does, which is why the honest
+statement is not "the tool measures angle" but "the tool measures angle to within 1% below 20°, and
+you need better geometry above that."
+
+## The second geometry has a different error
+
+When I rebuilt the instrument I also wanted a top-down view, looking at the dome's axis instead of its
+rim, because a marker there rotates in place: no arc to traverse, no foreshortening, no pointer
+disappearing over the horizon. That rig has different geometry — a plane, not a cylinder — and a
+different characteristic error.
+
+A camera that is not square-on to a plane cannot be calibrated with a translation and a single scale.
+A tilt compresses one axis of the image by `cos θ`; at 25° that is 0.906, so amplitudes on that axis
+come out 9.4% short. I simulated a 50 mm circular target at 0.8 Hz, filmed at 25°, tracked with 0.2 px
+of noise, and ran the full analysis:
+
+| Calibration | X amplitude | Y amplitude | Frequency error |
+|---|---|---|---|
+| Uniform scale + origin | 49.954 mm (−0.1%) | **45.340 mm (−9.3%)** | 0.00 mHz |
+| Four-corner homography | 49.993 mm (−0.01%) | 49.993 mm (−0.01%) | 0.01 mHz |
+
+A circular target reported as an ellipse. Not with an error message — with a confident geometric
+description, plus a phase of −89.97° that says "quadrature, elliptical orbit". If I had been measuring
+an unfamiliar apparatus I would have written "the orbit is slightly elliptical" in a notebook and moved
+on. The instrument would have been believed.
+
+The fix for this one is a different calibration model, not a correction factor: four points on a
+printed square define a homography, the full projective mapping from the plane to the image, and a
+homography removes tilt without knowing the angle.
+
+So the two geometries fail differently, and the failure is in the reader's mental model each time. On
+the cylinder, a millimetre reading is a chord and the angle is under-reported. On the plane, an
+off-axis camera is an ellipse and one axis is under-reported. Both produce numbers that look smooth,
+reproducible, and physical.
+
+## The third defect had a confidence interval
+
+The frequency in that first table was correct, but not for the reason I assumed. The 2012 analyser finds
+where the signal crosses its own mean and averages the half-period between crossings. That is a fine
+definition for a signal that never decays. A pendulum decays.
+
+On a damped signal the crossings are not evenly spaced; the envelope pulls them together, and the
+resulting frequency estimate is biased. I measured it by fitting a damped sinusoid
+`A·e^(−γt)·cos(2πft + φ) + c` to the same data, over 200 trials at each noise level:
 
 | Signal-to-noise | Zero-crossing frequency error | Fit frequency error | Fit phase error (median) |
 |---|---|---|---|
@@ -92,9 +128,9 @@ noise level:
 | 20 dB | 1219 mHz | 0.62 mHz | 0.41° |
 | 10 dB | 5198 mHz | 1.21 mHz | 1.06° |
 
-At a realistic webcam noise level the old estimator is off by 1.2 Hz on a 1.7 Hz signal — 70%. The
-fit is off by less than a millihertz, and it also returns the damping coefficient, which the old
-method could not produce at all.
+At a realistic webcam noise level the old estimator is off by 1.2 Hz on a 1.7 Hz signal — 70%. The fit
+is off by less than a millihertz, and it also returns the damping coefficient, which the old method
+could not produce at all.
 
 But the row that matters most is 10 dB. My first version of the fit, unbounded, returned a frequency
 error of 594 Hz **while reporting convergence**. It had walked to a different local minimum and was
@@ -107,27 +143,26 @@ straight face. An instrument that reports `reliable: false` is more useful than 
 0.8 Hz ± 0.0000, because the second is indistinguishable from a good measurement and the first starts
 a conversation.
 
-## The third defect is not in the software
+## The fourth defect is not in the software
 
 A homography corrects the plane the calibration target sits in. It says nothing about the plane the
-marker sits in. If the marker is 20 mm above the calibrated surface and the camera is 25° off normal,
-the marker appears displaced by roughly `h · tan θ` — about 9 mm. That is *larger* than the tilt error
-the homography just removed, and no amount of software fixes it, because the software is being told
-the wrong geometry.
+marker sits in. If a marker is 20 mm above the calibrated surface and the camera is 25° off normal, the
+marker appears displaced by roughly `h · tan θ` — about 9 mm. That is *larger* than the tilt error the
+homography just removed, and no software fixes it, because the software is being told the wrong
+geometry.
 
 The same is true of lens distortion: a wide webcam at close range bends straight lines near the frame
-edge by several pixels, and no homography will unbend them. Either you calibrate the camera and
-undistort, or you restrict measurement to the central third of the frame and write that down.
+edge by several pixels, and no homography unbends them. Either you calibrate the camera and undistort,
+or you restrict measurement to the central third and write that down.
 
-So the taxonomy of geometric error is: one part software (tilt), one part procedure (marker height),
-one part optics (distortion). Only two of the three are fixable in a commit. The third is fixable only
-by telling the operator what to do — which is documentation, or it is a bug report waiting to happen.
+So the taxonomy of geometric error is: one part software, one part procedure, one part optics. Only
+two of the three are fixable in a commit. The third is fixable only by telling the operator what to
+do — which is documentation, or it is a bug report waiting to happen.
 
 ## What actually makes a number checkable
 
-Fixing the estimator and the calibration made the instrument accurate. It did not make it
-*trustworthy*, because accuracy under my own hands says nothing about a number arriving in someone
-else's inbox as a CSV attachment.
+Fixing the geometry made the instrument accurate. It did not make it *trustworthy*, because accuracy
+under my own hands says nothing about a number arriving in someone else's inbox as a CSV attachment.
 
 A CSV is a claim. Anyone can edit a row, delete the segment where the tracker lost the target, or
 re-run with a different scale and present the result as the original. So the tool now emits a receipt:
@@ -137,8 +172,8 @@ over all of it. Verification recomputes every field and reports the first diverg
 
 This gives two different guarantees, and conflating them is the usual mistake:
 
-- **Integrity** — these are the numbers the receipt describes. A hash chain gives this. It is weak:
-  a hash proves a file is unchanged, not that it was produced by anything in particular.
+- **Integrity** — these are the numbers the receipt describes. A hash chain gives this. It is weak: a
+  hash proves a file is unchanged, not that it was produced by anything in particular.
 - **Recomputability** — given the same frames, calibration and parameters, running the tool
   reproduces these numbers. This is the stronger claim, and it is why the receipt records parameters
   that do not affect the CSV bytes at all. Without them, "same file" says nothing about "same result".
@@ -162,12 +197,12 @@ Every defect above was invisible in the output and obvious in the documentation.
 advertises the project — in the specific, unfashionable documents that answer "what does this number
 mean, and when should I not believe it?"
 
-The tilt error was caught because someone wrote down that the calibration is a translation and a
-uniform scale, which made "what if the camera is tilted?" a question with an answer.
-The estimator bias was caught because the method was documented precisely enough to be compared
-against an alternative.
-The marker-height error cannot be fixed at all without a document telling an operator which plane to
-calibrate in.
+The chord error was caught because someone wrote down the geometry: a pointer on the circumference of
+a cylinder does not travel in a straight line. The tilt error was caught because someone wrote down
+that the calibration is a translation and a uniform scale, which made "what if the camera is tilted?"
+a question with an answer. The estimator bias was caught because the method was documented precisely
+enough to be compared against an alternative. The marker-height error cannot be fixed at all without a
+document telling an operator which plane to calibrate in.
 
 This is the argument I would make to anyone who thinks documentation is what you write after the
 engineering is done. Documentation is how an instrument knows what it cannot measure. A tool that
@@ -175,25 +210,28 @@ reports 49.954 and 45.340 without a word about calibration geometry is not hones
 confident. The four documents that fix that are different in kind, not in length:
 
 - **A tutorial** that gets you from nothing to one number, so you can form a first impression.
-- **A how-to** for a specific job — calibrate a tilted camera — because that is what you need on the
-  day the tilt is real.
+- **A how-to** for a specific job — measure rotation from a side view, calibrate a tilted camera —
+  because that is what you need on the day the geometry is wrong.
 - **A reference** that states contracts and schemas, so you can predict behaviour without running
   anything.
 - **An explanation** like this one, which is where the reasoning lives: why the error exists, why the
   obvious fix is wrong, and what the instrument still cannot do.
 
 The best documentation, though, is the part that fires at the moment of the mistake rather than in a
-document nobody opens. When the tool sees an affine calibration it now says:
+document nobody opens. When the tool sees a chord amplitude that implies an implausible angle, it now
+says:
 
 ```
 warnings
- - affine calibration: any camera tilt appears as amplitude error
-   that grows with distance from the origin
+ - small-angle shortcut would report 37.8° instead of 42.2° (10% low)
+ - amplitude above 30°: the asin inversion ignores the perspective term
+   and under-reports by several percent
 ```
 
-That sentence is documentation. It is eighteen words, it is in the right place, and it would have
-saved me fourteen years of trusting a number that was wrong by 9%.
+Those two sentences are documentation. They are in the right place, they name the error and its
+direction, and they would have saved me fourteen years of trusting a number that was wrong by ten
+percent.
 
-The pendulum never cared. It swung in a circle either way, and it would have swung in a circle if I
-had reported the orbit as elliptical. Only the reader of the number cares — and the reader is who
-documentation is for.
+The dome never cared. It turned either way, and it would have turned if I had reported the angle as
+16% smaller than it was. Only the reader of the number cares — and the reader is who documentation is
+for.

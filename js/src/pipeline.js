@@ -21,7 +21,7 @@ const MIN_PERIODS = 3
  * @param {object} [options.calibration] {model:'homography', H, reprojectionPx} | {model:'affine', origin:[x,y], pixelsPerUnit}
  * @param {string} [options.units]
  */
-export function analyze({ csvText, calibration = null, units = 'units' }) {
+export function analyze({ csvText, calibration = null, units = 'units', radiusMm = null }) {
   const rows = parseCsv(csvText)
   const gapInfo = summariseRows(rows)
   const warnings = []
@@ -42,13 +42,15 @@ export function analyze({ csvText, calibration = null, units = 'units' }) {
   }
 
   const fitX = fitDampedSinusoid(times, xs)
-  const fitY = fitDampedSinusoid(times, ys)
+  // A side view of a rotating body carries one meaningful axis; fitting the
+  // other would report the noise floor as an oscillation.
+  const fitY = radiusMm ? null : fitDampedSinusoid(times, ys)
 
-  if (!fitX.reliable) warnings.push('X axis fit failed its reliability check; treat frequency as indicative')
-  if (!fitY.reliable) warnings.push('Y axis fit failed its reliability check; treat frequency as indicative')
+  if (!fitX.reliable && !radiusMm) warnings.push('X axis fit failed its reliability check; treat frequency as indicative')
+  if (fitY && !fitY.reliable) warnings.push('Y axis fit failed its reliability check; treat frequency as indicative')
 
   const duration = times[times.length - 1] - times[0]
-  const slowest = Math.max(fitX.frequency, fitY.frequency) || 1
+  const slowest = Math.max(fitX.frequency, fitY?.frequency ?? 0) || 1
   if (duration * slowest < MIN_PERIODS) {
     warnings.push(`record covers ${(duration * slowest).toFixed(1)} periods; ${MIN_PERIODS} or more is advisable`)
   }
@@ -65,13 +67,18 @@ export function analyze({ csvText, calibration = null, units = 'units' }) {
     )
   }
 
-  if (calibration?.model === 'affine') {
+  if (calibration?.model === 'affine' && !radiusMm) {
     warnings.push(
       'affine calibration: any camera tilt appears as amplitude error that grows with distance from the origin',
     )
   }
 
-  const delta = phaseDifference(fitY, fitX)
+  const delta = fitY ? phaseDifference(fitY, fitX) : null
+
+  // A marker on the circumference travels on a cylinder: the calibrated x is a
+  // chord, r·sin θ. Inverting it turns the chord into an angle, which is the
+  // quantity a rotational experiment actually wants.
+  const rotation = radiusMm ? analyseRotation(times, xs, radiusMm, warnings) : null
 
   return {
     units,
@@ -82,11 +89,14 @@ export function analyze({ csvText, calibration = null, units = 'units' }) {
     calibration: calibration ?? { model: 'none' },
     gapInfo,
     axes: { x: fitX, y: fitY },
-    phase: {
-      degrees: delta.degrees,
-      standardError: delta.standardError,
-      interpretation: describePhase(delta.degrees, delta.standardError),
-    },
+    rotation,
+    phase: delta
+      ? {
+          degrees: delta.degrees,
+          standardError: delta.standardError,
+          interpretation: describePhase(delta.degrees, delta.standardError),
+        }
+      : null,
     warnings,
   }
 }
@@ -126,7 +136,8 @@ export function formatReport(result) {
         : 'none (using the coordinates as logged)'
   lines.push(`  calibration    ${calLabel}`)
   lines.push('')
-  for (const axis of ['x', 'y']) {
+  const axisList = result.rotation ? ['x'] : ['x', 'y']
+  for (const axis of axisList) {
     const fit = result.axes[axis]
     lines.push(
       `  ${axis.toUpperCase()}  f = ${fmt(fit.frequency, 4)} Hz ± ${fmt(fit.standardErrors.frequency, 4)}` +
@@ -137,14 +148,78 @@ export function formatReport(result) {
         `   ${fit.reliable ? 'reliable' : 'UNRELIABLE'}`,
     )
   }
-  lines.push('')
-  lines.push(
-    `  phase (Y − X)  ${fmt(result.phase.degrees, 2)}° ± ${fmt(result.phase.standardError, 2)}°  — ${result.phase.interpretation}`,
-  )
+  if (result.phase) {
+    lines.push('')
+    lines.push(
+      `  phase (Y − X)  ${fmt(result.phase.degrees, 2)}° ± ${fmt(result.phase.standardError, 2)}°  — ${result.phase.interpretation}`,
+    )
+  }
+  if (result.rotation) {
+    const rot = result.rotation
+    lines.push('')
+    lines.push(
+      `  rotation       ${fmt(rot.amplitudeDeg, 1)}° ± ${fmt(rot.amplitudeDegStandardError, 2)}° at ${rot.radiusMm} mm radius`,
+    )
+    lines.push(
+      `     chord ${fmt(rot.chordAmplitudeMm, 2)} mm; small-angle shortcut would say ${fmt(rot.naiveAmplitudeDeg, 1)}°` +
+        `   ${rot.reliable ? 'reliable' : 'UNRELIABLE'}`,
+    )
+  }
+
   if (result.warnings.length > 0) {
     lines.push('')
     lines.push('  warnings')
     for (const warning of result.warnings) lines.push(`   - ${warning}`)
   }
   return lines.join('\n')
+}
+
+
+/**
+ * Convert a chord to an angle and fit the angle series.
+ *
+ * The small-angle shortcut (θ ≈ x/r) is what a chord in millimetres usually gets
+ * mistaken for; it is 10% low at 45° and 26% low at 75°. `asin` is the correct
+ * inversion for a side view without perspective, and the perspective residual is
+ * reported by the fit's own residual rather than hidden.
+ */
+export function chordToAngle(x, radiusMm) {
+  if (!(radiusMm > 0)) throw new Error('radiusMm must be positive')
+  const ratio = Math.max(-0.999999, Math.min(0.999999, x / radiusMm))
+  return Math.asin(ratio)
+}
+
+function analyseRotation(times, xs, radiusMm, warnings) {
+  const radians = xs.map((x) => chordToAngle(x, radiusMm))
+  const fit = fitDampedSinusoid(times, radians)
+  const chordAmplitudeMm = Math.max(...xs.map(Math.abs))
+  const naiveDeg = (chordAmplitudeMm / radiusMm) * (180 / Math.PI)
+
+  if (chordAmplitudeMm > radiusMm) {
+    warnings.push('chord exceeds the stated radius; check the radius or the calibration')
+  }
+  if (!fit.reliable) warnings.push('rotation fit failed its reliability check')
+  const amplitudeDeg = Math.abs(fit.amplitude) * (180 / Math.PI)
+  const naiveError = ((naiveDeg - amplitudeDeg) / (amplitudeDeg || 1)) * 100
+  if (Math.abs(naiveError) > 2) {
+    warnings.push(
+      `small-angle shortcut would report ${naiveDeg.toFixed(1)}° instead of ${amplitudeDeg.toFixed(1)}° (${Math.abs(naiveError).toFixed(0)}% low)`,
+    )
+  }
+  if (amplitudeDeg > 30) {
+    warnings.push(
+      'amplitude above 30°: the asin inversion ignores the perspective term and under-reports by several percent',
+    )
+  }
+
+  return {
+    radiusMm,
+    amplitudeDeg,
+    amplitudeDegStandardError: fit.standardErrors.amplitude * (180 / Math.PI),
+    frequencyHz: fit.frequency,
+    damping: fit.damping,
+    chordAmplitudeMm,
+    naiveAmplitudeDeg: naiveDeg,
+    reliable: fit.reliable,
+  }
 }

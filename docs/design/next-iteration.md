@@ -130,10 +130,29 @@ with Hartley normalisation; exact for four points, least-squares beyond.
 
 This is the strongest idea in the list, and it changes what the instrument measures.
 
-**Why the circumference marker is weak.** A point on the circumference gives `x(t) = R·cos θ(t)`
-projected through a perspective camera. Three losses: the amplitude must be divided by a separately
-known radius to recover angle; the feature moves through the frame and is foreshortened at the ends of
-the arc; and any wobble of the rotation axis is indistinguishable from rotation.
+**The original apparatus was a side view, and that is a distinct geometry.** A pointer on a strip
+around the dome's circumference, filmed from about two feet away, gives `x(t) = r·sin θ(t)` — a chord,
+not an arc. Measured against simulated truth (`js/bench/cylinder.mjs`, r = 152.5 mm, camera 610 mm):
+
+| True amplitude | `asin(x/r)` | Chord ÷ radius |
+|---|---|---|
+| 20° | −1.2% | −3.0% |
+| 30° | −2.7% | −7.3% |
+| 45° | −6.2% | −15.9% |
+| 60° | −11.8% | −26.3% |
+
+Frequency is unaffected at every amplitude (< 0.1 mHz), which is why the error survived: the period —
+the quantity the experiment existed to measure — was always right. The pipeline now accepts
+`radiusMm` and reports `rotation.amplitudeDeg`, with a warning above 30°.
+
+Note also that the white paper strip in the original rig was doing real work: it removes the dome's
+periodic mesh texture across the tracking band, which is exactly the failure mode that makes corner
+detection hop between identical features. Any redesign must keep an equivalent contrast band.
+
+**Why the circumference marker is still weak.** Three losses remain: the amplitude must be divided by
+a separately known radius to recover angle; the feature moves through the frame and is foreshortened
+at the ends of the arc (apparent speed falls to 50% at 60° and 26% at 75°); and any wobble of the
+rotation axis is indistinguishable from rotation.
 
 **Why the axis marker is better.** Viewed from above, a marker on the rotating body rotates *in place*:
 
