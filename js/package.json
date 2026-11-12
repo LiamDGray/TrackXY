@@ -1,0 +1,12 @@
+{
+  "name": "trackxy-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Portable numerical core for TrackXY: estimators, calibration geometry, marker angle",
+  "scripts": {
+    "test": "node --test test/",
+    "bench": "node bench/estimator_benchmark.mjs"
+  },
+  "license": "AGPL-3.0"
+}
