@@ -20,6 +20,10 @@ troubleshooting table that would have saved me a 9% error.
 circumference gives you a chord, not an angle. How to recover the angle, where the correction stops
 working, and when to change the geometry instead.
 
+**[Instrument a torsion balance](how-to/instrument-a-torsion-balance.md)** — the protocol this rig
+was built for: sampling rate, period, torsion constant, and the four quantities it reports (centre
+shift, amplitude envelope, spectrum, relaxation constant), with the limits of each.
+
 Also useful on the job: `tools/measurement_receipt.py` to bind a result to its inputs
 ([provenance](measurement-provenance.md)), and `js/src/cli.js` to analyse a CSV without a camera.
 

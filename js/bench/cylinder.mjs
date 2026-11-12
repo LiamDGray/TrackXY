@@ -11,7 +11,7 @@
 import { analyze } from '../src/pipeline.js'
 import { simulateRotation, observeCylinder, toCsv } from '../src/synthetic.js'
 
-const RADIUS_MM = 152.5
+const RADIUS_MM = 175
 const FREQUENCY = 0.8
 const SECONDS = 12
 const NOISE_PX = 0.2
@@ -22,7 +22,7 @@ console.log('-------|--------|-------|---------|--------|----------')
 
 for (const amplitudeDeg of [5, 10, 20, 30, 45, 60, 75]) {
   const trajectory = simulateRotation({ amplitudeDeg, frequency: FREQUENCY, seconds: SECONDS, noisePx: NOISE_PX })
-  const { rows, calibration } = observeCylinder(trajectory)
+  const { rows, calibration } = observeCylinder(trajectory, { radiusMm: RADIUS_MM })
   const result = analyze({ csvText: toCsv(rows), calibration, radiusMm: RADIUS_MM })
   const rot = result.rotation
   const asinErr = ((rot.amplitudeDeg - amplitudeDeg) / amplitudeDeg) * 100

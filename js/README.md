@@ -14,6 +14,7 @@ npm run bench   # Monte Carlo estimator comparison
 # Analyse a recording (with or without a calibration)
 node src/cli.js analyze --csv out.csv --calib camera.calibration.json [--json]
 node src/cli.js synthesize --out sample.csv [--tilt 25] [--radius 50] [--seconds 12]
+node src/cli.js balance --csv run.csv --window 120   # long torsion-balance recordings
 
 npm run bench:estimator   # SNR sweep, both estimators
 npm run bench:accuracy    # closed-loop: affine vs homography over radius
