@@ -10,7 +10,9 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
-import { analyze, formatReport } from './pipeline.js'
+import { analyze, formatReport, projectSeries } from './pipeline.js'
+import { analyzeBalance, TORSION_DEFAULTS } from './balance.js'
+import { periodogram } from './spectrum.js'
 import { fitHomography, reprojectionError } from './calibration.js'
 import {
   simulateTrajectory,
@@ -59,6 +61,49 @@ export function loadCalibration(path) {
     return { model: 'homography', H, reprojectionPx: error.max, rmsPx: error.rms }
   }
   throw new Error(`unknown calibration model: ${raw.model}`)
+}
+
+function balance(options) {
+  if (!options.csv) throw new Error('--csv is required')
+  const csvText = readFileSync(options.csv, 'utf8')
+  const calibration = options.calib ? loadCalibration(options.calib) : null
+  const { times, xs } = projectSeries({ csvText, calibration })
+
+  const torsion = {
+    cmPerDeg: Number(options['cm-per-deg'] ?? TORSION_DEFAULTS.cmPerDeg),
+    mgPerDeg: Number(options['mg-per-deg'] ?? TORSION_DEFAULTS.mgPerDeg),
+  }
+  const windowSeconds = Number(options.window ?? 300)
+  const result = analyzeBalance(times, xs, { windowSeconds, torsion })
+  const spectrum = periodogram(times, result.residual, { maxPeaks: 5, detrend: 1, minFrequency: 0.004 })
+
+  if (options.json) {
+    const { residual, segments, residualSegments, ...summary } = result
+    process.stdout.write(
+      JSON.stringify({ ...summary, segments, residualSegments, spectrum: { peaks: spectrum.peaks, resolutionHz: spectrum.resolutionHz } }, null, 2) + '\n',
+    )
+    return 0
+  }
+
+  const f = (v, d = 2) => v.toFixed(d)
+  const duration = times[times.length - 1] - times[0]
+  const lines = []
+  lines.push('Torsion balance analysis')
+  lines.push(`  samples        ${times.length} (${f(duration, 1)} s, ${f(times.length / duration, 2)} Hz)`)
+  lines.push(`  windows        ${result.segments.length} × ${windowSeconds} s`)
+  lines.push('')
+  lines.push(`  centre shift   ${f(result.cooShiftCm)} cm = ${f(result.cooShiftDeg, 1)}° = ${f(result.cooShiftMg, 0)} mg equivalent`)
+  lines.push(`  amplitude      half peak-to-peak max ${f(result.amplitudeMaxCm)} cm; peak-to-peak ${f(result.peakToPeakMaxCm)} cm`)
+  lines.push(
+    `  relaxation     τ = ${f(result.relaxation.tau, 0)} s from onset ≈ ${f(result.relaxation.onset, 0)} s, R² = ${f(result.relaxation.rSquared, 3)}`,
+  )
+  lines.push('')
+  lines.push('  spectrum')
+  for (const peak of spectrum.peaks) {
+    lines.push(`   - ${f(peak.frequency, 4)} Hz  (${f(peak.power * 100, 0)}% of strongest)`)
+  }
+  process.stdout.write(lines.join('\n') + '\n')
+  return 0
 }
 
 function synthesize(options) {
@@ -112,8 +157,9 @@ function run(options) {
 
 const { command, options } = parseArgs(process.argv.slice(2))
 try {
-  const code = command === 'synthesize' ? synthesize(options) : command === 'analyze' ? run(options) : (() => {
-    throw new Error(`unknown command: ${command ?? '(none)'}; expected analyze or synthesize`)
+  const handlers = { analyze: run, balance, synthesize }
+  const code = handlers[command] ? handlers[command](options) : (() => {
+    throw new Error(`unknown command: ${command ?? '(none)'}; expected analyze, balance or synthesize`)
   })()
   process.exit(code)
 } catch (error) {

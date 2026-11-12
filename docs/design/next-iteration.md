@@ -132,14 +132,14 @@ This is the strongest idea in the list, and it changes what the instrument measu
 
 **The original apparatus was a side view, and that is a distinct geometry.** A pointer on a strip
 around the dome's circumference, filmed from about two feet away, gives `x(t) = r·sin θ(t)` — a chord,
-not an arc. Measured against simulated truth (`js/bench/cylinder.mjs`, r = 152.5 mm, camera 610 mm):
+not an arc. Measured against simulated truth (`js/bench/cylinder.mjs`, r = 175 mm, camera 610 mm):
 
 | True amplitude | `asin(x/r)` | Chord ÷ radius |
 |---|---|---|
-| 20° | −1.2% | −3.0% |
-| 30° | −2.7% | −7.3% |
-| 45° | −6.2% | −15.9% |
-| 60° | −11.8% | −26.3% |
+| 20° | −1.3% | −3.2% |
+| 30° | −3.0% | −7.7% |
+| 45° | −7.1% | −16.8% |
+| 60° | −13.2% | −27.5% |
 
 Frequency is unaffected at every amplitude (< 0.1 mHz), which is why the error survived: the period —
 the quantity the experiment existed to measure — was always right. The pipeline now accepts

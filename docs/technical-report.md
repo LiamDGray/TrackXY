@@ -251,6 +251,10 @@ prototype into something publishable.
 5. OpenTimestamps. <https://opentimestamps.org>
 6. C2PA Content Credentials. <https://c2pa.org>
 7. RealPeep — anonymous proof of capture. <https://github.com/LiamDGray/realpeep>
+8. J. N. Hansen, J. A. Lieberman. *Use of a torsion pendulum balance to detect and characterize what
+   may be a human bioenergy field.* Journal of Scientific Exploration 27(2), 2013. The protocol this
+   instrument was built to reproduce; see [instrumenting a torsion
+   balance](how-to/instrument-a-torsion-balance.md).
 
 ## Appendix A — Output schema
 

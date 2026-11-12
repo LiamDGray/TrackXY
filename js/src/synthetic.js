@@ -215,3 +215,43 @@ export function observeCylinder(
   const calibration = { model: 'affine', origin: [cx, cy], pixelsPerUnit: focalPx / distanceMm }
   return { rows, calibration }
 }
+
+
+/**
+ * A torsion-balance recording, parameterised the way the published protocol
+ * describes it: 10 samples/s, a ~30 s period, heavy damping, and a centre of
+ * oscillation that drifts with a chemical-relaxation time constant.
+ */
+export function simulateBalance({
+  frequency = 0.034,
+  gamma = 0.009,
+  amplitudeCm = 0.5,
+  sampleRate = 10,
+  seconds = 1800,
+  phase = 0,
+  driftCm = 0,
+  driftTau = 400,
+  driftStart = 300,
+  extraTones = [],
+  noiseCm = 0.02,
+  seed = 20261112,
+} = {}) {
+  const rand = makeRng(seed)
+  const n = Math.round(seconds * sampleRate)
+  const t = []
+  const x = []
+  for (let i = 0; i < n; i += 1) {
+    const ti = i / sampleRate
+    const envelope = Math.exp(-gamma * ti)
+    let value = amplitudeCm * envelope * Math.cos(2 * Math.PI * frequency * ti + phase)
+    for (const tone of extraTones) {
+      value += tone.amplitudeCm * Math.exp(-gamma * ti) * Math.cos(2 * Math.PI * tone.frequency * ti + (tone.phase ?? 0))
+    }
+    if (driftCm !== 0 && ti > driftStart) {
+      value += driftCm * (1 - Math.exp(-(ti - driftStart) / driftTau))
+    }
+    t.push(ti)
+    x.push(value + noiseCm * rand())
+  }
+  return { t, x }
+}

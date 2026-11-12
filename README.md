@@ -20,6 +20,7 @@ Modernized version of the original TrackXY project (2012).
 | [docs/tutorials/first-measurement.md](docs/tutorials/first-measurement.md) | Ten-minute tour: analyse a synthetic recording, twice, and see what a calibration model changes |
 | [docs/how-to/calibrate-a-tilted-camera.md](docs/how-to/calibrate-a-tilted-camera.md) | Procedure for a camera that cannot be square-on, with troubleshooting |
 | [docs/how-to/measure-rotation-from-a-side-view.md](docs/how-to/measure-rotation-from-a-side-view.md) | Chord-vs-arc correction for a marker on a circumference, and when it stops working |
+| [docs/how-to/instrument-a-torsion-balance.md](docs/how-to/instrument-a-torsion-balance.md) | The torsion-balance protocol: centre shift, spectrum, relaxation constant, and their limits |
 | [docs/explanation/the-number-is-not-the-evidence.md](docs/explanation/the-number-is-not-the-evidence.md) | Why the numbers can be fluent and wrong: three defects, measured |
 | [docs/technical-report.md](docs/technical-report.md) | Method, assumptions, verification status, limitations, roadmap |
 | [docs/architecture.md](docs/architecture.md) | Components, contracts, frame lifecycle, output schema, test strategy |
@@ -120,7 +121,10 @@ node src/cli.js synthesize --out /tmp/run.csv --tilt 25 --radius 50   # known-an
 node src/cli.js analyze --csv /tmp/run.csv --calib /tmp/run.calibration-homography.json
 
 # A marker on a circumference: give the radius to get an angle, not a chord
-node src/cli.js analyze --csv /tmp/run.csv --calib camera.json --radius 152.5
+node src/cli.js analyze --csv /tmp/run.csv --calib camera.json --radius 175
+
+# Long balance recordings: centre-of-oscillation shift, spectrum, relaxation
+node src/cli.js balance --csv run.csv --window 120
 ```
 
 ```

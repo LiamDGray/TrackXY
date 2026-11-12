@@ -40,7 +40,8 @@ For the geometry of that rig, the pointer's horizontal position is a chord:
 x(t) = r · sin θ(t)
 ```
 
-with `r` the dome radius — about 152 mm for a one-foot dome. To recover the angle you have to invert
+with `r` the dome radius — about 175 mm for the 35 cm hemisphere in the published apparatus, which its
+own calibration confirms: 1° at 175 mm is 3.05 mm, the quoted 0.3 cm. To recover the angle you have to invert
 that: `θ = asin(x / r)`. If you instead treat the chord in millimetres as an arc length, dividing by
 the radius gives an angle that is wrong by exactly the ratio `sin θ / θ`:
 
@@ -68,14 +69,14 @@ The correction itself is one line, and it is enough up to about 20°:
 
 | True amplitude | `asin` inversion | Treating the chord as an arc |
 |---|---|---|
-| 10° | −0.3% | +0.3% |
-| 20° | −1.2% | −3.0% |
-| 30° | −2.7% | −7.3% |
-| 45° | −6.2% | −15.9% |
-| 60° | −11.8% | −26.3% |
-| 75° | −19.8% | −37.6% |
+| 10° | −0.4% | 0.0% |
+| 20° | −1.3% | −3.2% |
+| 30° | −3.0% | −7.7% |
+| 45° | −7.1% | −16.8% |
+| 60° | −13.2% | −27.5% |
+| 75° | −21.8% | −39.0% |
 
-The residual is perspective: the pointer is 152 mm closer to the camera at the front of the dome than
+The residual is perspective: the pointer is 175 mm closer to the camera at the front of the dome than
 at the sides, and `asin` does not know that. A full camera model does, which is why the honest
 statement is not "the tool measures angle" but "the tool measures angle to within 1% below 20°, and
 you need better geometry above that."
@@ -188,6 +189,28 @@ A receipt cannot prove the apparatus was set up correctly, that the calibration 
 length, or that the camera was not pointed at a photograph. It proves the chain from attested capture
 to arithmetic is intact. That is a narrower claim than "the science is right", and it is the only one
 worth making.
+
+## What the instrument was actually for
+
+The rig was not a demonstration. It was built to reproduce a published torsion-balance protocol: a
+15 × 35 cm steel-mesh hemisphere on a short monofilament, a subject seated beneath it, a camera
+side-on, ten measurements per second, and a natural period of about thirty seconds.
+
+That protocol does not ask for a frequency. It asks where the centre of oscillation sits and how far
+it moves — up to 2.2 cm, which the torsion constant turns into 7.3° and 34 mg of equivalent force —
+how large the oscillations are, which frequencies are present, and how quickly the centre relaxes,
+reported as a time constant.
+
+None of those is a single damped sinusoid, and my first rebuild could produce only the sinusoid. A
+fit with one offset for a thirty-minute recording cannot see a shift; a peak-to-peak amplitude
+measured without removing that shift inflates it; a spectrum computed without detrending is dominated
+by the drift; and an onset estimated from a threshold biases the relaxation constant by however late
+the threshold fired. Each of those is a small piece of engineering, and each of them is exactly the
+kind of thing that decides whether a contested result means anything.
+
+So the software grew a balance mode: a moving-median centre, a fitted relaxation with a reported
+goodness of fit, a detrended envelope, and a periodogram whose peaks are normalised inside the band
+of interest rather than across a drift that owns the bottom of the spectrum.
 
 ## The turn
 

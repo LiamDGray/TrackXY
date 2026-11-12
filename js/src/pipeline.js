@@ -101,6 +101,22 @@ export function analyze({ csvText, calibration = null, units = 'units', radiusMm
   }
 }
 
+/** Extract (time, x, y) series for external analyses such as balance mode. */
+export function projectSeries({ csvText, calibration = null }) {
+  const rows = parseCsv(csvText)
+  const usable = rows.filter((row) => row.tracking)
+  const times = []
+  const xs = []
+  const ys = []
+  for (const row of usable) {
+    const [x, y] = project(row, calibration)
+    times.push(row.milliseconds / 1000)
+    xs.push(x)
+    ys.push(y)
+  }
+  return { rows, usable, times, xs, ys, gapInfo: summariseRows(rows) }
+}
+
 function project(row, calibration) {
   if (calibration?.model === 'homography') return applyHomography(calibration.H, [row.xPx, row.yPx])
   if (calibration?.model === 'affine') {

@@ -16,7 +16,10 @@ The formula uses the radius of the circle **the pointer actually travels on**. F
 a dome, that is the distance from the rotation axis to the strip's centreline, which is smaller than the
 dome's outer radius by the shell thickness plus half the strip width.
 
-Measure it to the nearest millimetre. A 2 mm error in a 152 mm radius is a 1.3% error in every angle,
+For the 35 cm hemisphere of the published apparatus, the pointer runs at about 175 mm — confirmed by
+its own calibration, since 1° at 175 mm is 3.05 mm, the stated 0.3 cm.
+
+Measure it to the nearest millimetre. A 2 mm error in a 175 mm radius is a 1.1% error in every angle,
 which is comparable to the corrections you are making.
 
 If the dome is not circular — a frustum, an ellipse — there is no single radius, and this method does
@@ -35,7 +38,7 @@ inversion below handles only the second.
 
 ```bash
 cd js
-node src/cli.js analyze --csv run.csv --calib camera.calibration.json --radius 152.5
+node src/cli.js analyze --csv run.csv --calib camera.calibration.json --radius 175
 ```
 
 ```
@@ -48,8 +51,8 @@ TrackXY analysis
      damping = 0.0104 /s   offset = -0.2 mm   reliable
   ...
 
-  rotation       42.2° ± 0.2° at 152.5 mm radius
-     chord 100.5 mm; small-angle shortcut would say 37.8°
+  rotation       41.8° ± 0.2° at 175 mm radius
+     chord 100.5 mm; small-angle shortcut would say 37.5°
 ```
 
 Read the `rotation` line, not the `X amplitude` line. The amplitude in millimetres is a chord measured
@@ -63,12 +66,12 @@ amplitude. Measured against simulated truth (`npm run bench:cylinder`):
 
 | True amplitude | `asin` inversion | Naive chord ÷ radius |
 |---|---|---|
-| 10° | −0.3% | +0.3% |
-| 20° | −1.2% | −3.0% |
-| 30° | −2.7% | −7.3% |
-| 45° | −6.2% | −15.9% |
-| 60° | −11.8% | −26.3% |
-| 75° | −19.8% | −37.6% |
+| 10° | −0.4% | 0.0% |
+| 20° | −1.3% | −3.2% |
+| 30° | −3.0% | −7.7% |
+| 45° | −7.1% | −16.8% |
+| 60° | −13.2% | −27.5% |
+| 75° | −21.8% | −39.0% |
 
 Use it below 20°. Above 30° the tool warns and you should treat the amplitude as a lower bound. Above
 60°, change the geometry rather than the arithmetic.
