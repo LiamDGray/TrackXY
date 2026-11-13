@@ -25,7 +25,7 @@
 #
 # Prerequisites:
 #   - Run with GEMINI_API_KEY and DEEPSEEK_API_KEY already in the environment,
-#     e.g.:  set -a; source <(sops --input-type dotenv -d secrets.enc.env); set +a
+#     e.g.:  set -a; source <(sops --input-type dotenv -d ~/src/secrets/secrets.enc.env); set +a
 #   - LiteLLM proxy optionally running: litellm --config config.yaml --port 4000
 
 echo "Starting the Wiggum Loop for TrackXY..."

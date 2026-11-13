@@ -8,3 +8,6 @@ docs/private/
 *Hansen*.pdf
 *Parts List*.pdf
 *.session.json
+
+# Secrets live at ~/src/secrets/ (outside the repository). See PUBLISHING.md.
+secrets.enc.env

@@ -26,11 +26,11 @@ why they are not in the repository.
 The repository was public and archived until 2026-11-12, and it became private before any of the
 instrumentation work was pushed. Two things are still reachable in history and one in the tip:
 
-| Item | Where | Before any public release |
-|---|---|---|
-| `secrets.enc.env` | tip, sops-encrypted | Rotate the keys it wraps and remove it, with its history; a sops file is safe to commit only while the repository stays private |
-| `sample.csv` (2012 capture) and `sample.csv in LibreOffice Calc.png` | added in `c8f34f5`, removed in `44c07e7` | Rewrite history to drop both; they are session captures |
-| Commit message `81bf90b` names the source paper's authors and journal | history | Rewrite the message; the message is part of the publication |
+| Item | Status |
+|---|---|
+| `secrets.enc.env` | **removed from the tree and from all history** on 2026-11-12; the file now lives at `~/src/secrets/secrets.enc.env` (0600) and is gitignored. Rotate the keys anyway: the blob was in a public repository until the repo was made private |
+| Commit message naming the source paper's authors and journal | **rewritten**; history now says "a published torsion-balance protocol" |
+| `sample.csv` (2012 capture) and `sample.csv in LibreOffice Calc.png` | **retained deliberately.** A 21-second configuration echo plus a tracking test: no personal data, no participant, no framing. It shows the tracker losing lock, which is a useful artefact rather than an embarrassing one |
 
 The source paper and the parts list were **never pushed**. They existed in one unpushed commit, which
 was amended and pruned; `git rev-list --objects --all` contains neither.

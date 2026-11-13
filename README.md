@@ -177,8 +177,9 @@ then DeepSeek through the local LiteLLM proxy. On a quota error the driver parse
 `retryDelayMs`, parks that tier, advances, and restores the free tiers when their windows pass.
 Create a `.wiggum_stop` file to exit cleanly between iterations.
 
-Provider keys are supplied via `sops`-encrypted `secrets.enc.env` and inherited through the
-environment — never as command-line arguments.
+Provider keys are supplied via a `sops`-encrypted file kept **outside this repository**
+(`~/src/secrets/secrets.enc.env`) and inherited through the environment — never as command-line
+arguments, and never committed.
 
 ## License
 Original lkdemo.cpp (c) 2000-2006 Intel Corporation (BSD).
