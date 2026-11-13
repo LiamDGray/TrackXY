@@ -47,11 +47,11 @@ a longer filament and a lighter dome give a different mg-per-degree figure:
 
 - κ scales as `1/L`: 2.25 cm instead of 1.7 cm is about 24% lower.
 - The published 4.6 mg/deg therefore does not transfer. From `κ = 4π²I/T²` with a thin hemispherical
-  shell (`I ≈ ⅔mr²`, 0.18 kg, r = 0.175 m) and T = 30 s, κ ≈ 1.6 × 10⁻³ N·m/rad against the
-  published 2.24 × 10⁻³, and the force scale falls to roughly 3.3–3.6 mg/deg.
-- The published figure appears to apply the equivalent force at the hemisphere's centre of mass
-  (`r/2` = 8.75 cm), which reproduces their numbers to within a millimetre of lever arm. Apply yours at
-  the same point or the comparison is meaningless.
+  shell (`I ≈ ⅔mr²`, 0.18 kg, r = 0.175 m) and T = 30 s, κ ≈ 1.6 × 10⁻⁴ N·m/rad against the
+  published 2.24 × 10⁻⁴, and the force scale falls to roughly 3.3–3.6 mg/deg.
+- The published figure is applied at the hemisphere's centre of mass (`r/2` = 8.75 cm), not at the rim:
+  `2.24 × 10⁻⁴ N·m/rad × 0.01745 rad ÷ 0.0875 m` is 4.47 × 10⁻⁵ N, i.e. 4.6 mg. Apply the equivalent force
+  at the same lever arm or the comparison is meaningless.
 
 Measure κ on the actual assembly — add known masses to the rim and fit ω against the added moment of
 inertia, as the source paper does — rather than scaling the published value. The displacement

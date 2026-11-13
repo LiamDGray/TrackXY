@@ -20,6 +20,7 @@ Modernized version of the original TrackXY project (2012).
 | [docs/tutorials/first-measurement.md](docs/tutorials/first-measurement.md) | Ten-minute tour: analyse a synthetic recording, twice, and see what a calibration model changes |
 | [docs/how-to/calibrate-a-tilted-camera.md](docs/how-to/calibrate-a-tilted-camera.md) | Procedure for a camera that cannot be square-on, with troubleshooting |
 | [docs/how-to/measure-rotation-from-a-side-view.md](docs/how-to/measure-rotation-from-a-side-view.md) | Chord-vs-arc correction for a marker on a circumference, and when it stops working |
+| [docs/how-to/bound-the-error-in-a-slow-torsion-balance.md](docs/how-to/bound-the-error-in-a-slow-torsion-balance.md) | Uncertainty budget: every error source with a magnitude, and what a defensible claim looks like |
 | [docs/how-to/instrument-a-torsion-balance.md](docs/how-to/instrument-a-torsion-balance.md) | The torsion-balance protocol: centre shift, spectrum, relaxation constant, and their limits |
 | [docs/explanation/the-number-is-not-the-evidence.md](docs/explanation/the-number-is-not-the-evidence.md) | Why the numbers can be fluent and wrong: three defects, measured |
 | [docs/technical-report.md](docs/technical-report.md) | Method, assumptions, verification status, limitations, roadmap |

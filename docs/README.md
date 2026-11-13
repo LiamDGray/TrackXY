@@ -20,6 +20,10 @@ troubleshooting table that would have saved me a 9% error.
 circumference gives you a chord, not an angle. How to recover the angle, where the correction stops
 working, and when to change the geometry instead.
 
+**[Bound the error in a slow torsion balance](how-to/bound-the-error-in-a-slow-torsion-balance.md)** —
+the uncertainty budget: what each error source is worth, and what a defensible claim looks like. The
+piece to read if you are evaluating the writing rather than the apparatus.
+
 **[Instrument a torsion balance](how-to/instrument-a-torsion-balance.md)** — the protocol this rig
 was built for: sampling rate, period, torsion constant, and the four quantities it reports (centre
 shift, amplitude envelope, spectrum, relaxation constant), with the limits of each.
