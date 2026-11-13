@@ -1,6 +1,20 @@
-# TrackXY Modernized
-Track position of a point in webcam or video file, in realtime, using Lucas-Kanade optical flow.
-Modernized version of the original TrackXY project (2012).
+# TrackXY — optical measurement with receivable numbers
+
+Track a point in a webcam or video file in real time with Lucas–Kanade optical flow, calibrate pixels to physical units, and derive oscillation frequency, amplitude, and X/Y phase. This is the 2026 modernization of the original 2012 TrackXY project.
+
+**What it is:** a small, testable measurement instrument for one narrow case — a well-textured target moving slowly in a plane, viewed roughly square-on. It makes the units, failure modes, and provenance of a result explicit.
+
+**What it is not:** a calibrated metrology product, or evidence that a particular physical setup is correct. End-to-end accuracy against known ground truth is **not yet measured**; the receipt binds a result to its inputs but cannot prove the apparatus was set up properly. The [technical report](docs/technical-report.md#4-verification-status) states the boundary.
+
+## Verified status
+
+| Claim | Evidence |
+|---|---|
+| Tracker, calibration, logger, CLI, analysers, visualiser | Eleven Catch2 cases; no camera or display required |
+| Portable estimators, calibration geometry, marker angle | 36 Node tests in `js/`; benchmark reproduces the accuracy tables |
+| A result can be bound to its inputs | `tools/measurement_receipt.py` emit/verify; modified rows, appended rows, and changed calibration are rejected |
+| End-to-end accuracy against ground truth | **Not measured**; the next benchmark is specified in the report |
+| Cross-platform CI | CMake + C++17 locally; CI is not configured |
 
 ## Features
 - **Modern C++ Architecture**: Uses C++17 and OpenCV 4.x API.
