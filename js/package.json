@@ -10,7 +10,8 @@
     "bench:estimator": "node bench/estimator_benchmark.mjs",
     "bench:accuracy": "node bench/accuracy.mjs",
     "bench:cylinder": "node bench/cylinder.mjs",
-    "bench:fits": "node bench/fits-report.mjs"
+    "bench:fits": "node bench/fits-report.mjs",
+    "bench:inventory": "node bench/inventory-runs.mjs"
   },
   "license": "AGPL-3.0"
 }
