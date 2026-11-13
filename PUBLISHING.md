@@ -21,6 +21,20 @@ This file records the rule, the reason, and the check.
 Both documents are in `~/src/private/trackxy-replication/`, with a note there on what they are and
 why they are not in the repository.
 
+## Known history items
+
+The repository was public and archived until 2026-11-12, and it became private before any of the
+instrumentation work was pushed. Two things are still reachable in history and one in the tip:
+
+| Item | Where | Before any public release |
+|---|---|---|
+| `secrets.enc.env` | tip, sops-encrypted | Rotate the keys it wraps and remove it, with its history; a sops file is safe to commit only while the repository stays private |
+| `sample.csv` (2012 capture) and `sample.csv in LibreOffice Calc.png` | added in `c8f34f5`, removed in `44c07e7` | Rewrite history to drop both; they are session captures |
+| Commit message `81bf90b` names the source paper's authors and journal | history | Rewrite the message; the message is part of the publication |
+
+The source paper and the parts list were **never pushed**. They existed in one unpushed commit, which
+was amended and pruned; `git rev-list --objects --all` contains neither.
+
 ## What is in, and why
 
 The instrumentation: calibration geometry, estimators, drift and spectrum analysis, receipts, and the
